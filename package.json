@@ -1,0 +1,11 @@
+{
+  "name": "something_fun",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@atproto/api": "^0.17.5",
+    "cron": "^3.1.7",
+    "dotenv": "^16.4.5"
+  }
+}
