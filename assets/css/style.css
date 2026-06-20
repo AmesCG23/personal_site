@@ -18,7 +18,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -28,18 +27,19 @@ main {
   padding: 56px 72px 64px;
 }
 
-/* ── Portrait ────────────────────────────────────────── */
+/* Portrait */
 
 .portrait {
   float: right;
   width: 150px;
   height: 170px;
   object-fit: cover;
+  object-position: center 30%;
   margin-left: 28px;
   margin-bottom: 16px;
 }
 
-/* ── Name & role ─────────────────────────────────────── */
+/* Name & role */
 
 h1 {
   font-family: var(--display);
@@ -57,7 +57,7 @@ h1 {
   font-style: italic;
 }
 
-/* ── Bio ─────────────────────────────────────────────── */
+/* Bio */
 
 .bio {
   margin-top: 22px;
@@ -65,7 +65,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* ── Rules ───────────────────────────────────────────── */
+/* Rules */
 
 .rule {
   position: relative;
@@ -93,7 +93,7 @@ h1 {
   margin-top: 48px;
 }
 
-/* ── Writing entries ─────────────────────────────────── */
+/* Writing entries */
 
 .writing {
   display: flex;
@@ -149,7 +149,7 @@ h1 {
   margin-top: 6px;
 }
 
-/* ── Press & Video ───────────────────────────────────── */
+/* Press & Video */
 
 .press-video {
   display: grid;
@@ -158,29 +158,37 @@ h1 {
   align-items: start;
 }
 
-.quotes {
+.press-list {
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.quotes figure {
-  margin: 0;
+.press-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.quotes blockquote {
+.press-list a {
   font-family: var(--display);
-  font-size: 22px;
-  line-height: 1.35;
-  font-style: italic;
+  font-size: 20px;
+  line-height: 1.2;
   color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 1px;
 }
 
-.quotes figcaption {
+.press-list a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.press-source {
   font-size: 13px;
   font-style: italic;
   color: var(--ink-soft-text);
-  margin-top: 8px;
 }
 
 /* Video tile */
@@ -189,39 +197,24 @@ h1 {
   margin: 0;
 }
 
-.video-thumb {
-  display: block;
+.video-embed {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border: 1.5px solid var(--ink);
-  background: repeating-linear-gradient(
-    135deg,
-    transparent 0 9px,
-    var(--ink-soft) 9px 10px
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  border: 1px solid var(--ink);
 }
 
-.play {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--ink);
-  padding-left: 2px;
+.video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 .video figcaption {
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--ink-soft-text);
@@ -235,25 +228,7 @@ h1 {
   margin-top: 4px;
 }
 
-/* ── Also cited ──────────────────────────────────────── */
-
-.also-cited {
-  font-size: 15px;
-  line-height: 1.7;
-  margin-top: 28px;
-}
-
-.also-cited a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid var(--ink);
-}
-
-.also-cited a:hover {
-  border-bottom-color: var(--accent);
-}
-
-/* ── Footer ──────────────────────────────────────────── */
+/* Footer */
 
 footer {
   font-size: 13px;
@@ -269,7 +244,7 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* Responsive */
 
 @media (max-width: 640px) {
   main {
