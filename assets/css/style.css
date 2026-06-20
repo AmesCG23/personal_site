@@ -159,29 +159,37 @@ h1 {
   align-items: start;
 }
 
-.quotes {
+.press-list {
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.quotes figure {
-  margin: 0;
+.press-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.quotes blockquote {
+.press-list a {
   font-family: var(--display);
-  font-size: 22px;
-  line-height: 1.35;
-  font-style: italic;
+  font-size: 20px;
+  line-height: 1.2;
   color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 1px;
 }
 
-.quotes figcaption {
+.press-list a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.press-source {
   font-size: 13px;
   font-style: italic;
   color: var(--ink-soft-text);
-  margin-top: 8px;
 }
 
 /* Video tile */
@@ -219,24 +227,6 @@ h1 {
   line-height: 1.4;
   color: var(--ink-soft-text);
   margin-top: 4px;
-}
-
-/* ── Also cited ──────────────────────────────────────── */
-
-.also-cited {
-  font-size: 15px;
-  line-height: 1.7;
-  margin-top: 28px;
-}
-
-.also-cited a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid var(--ink);
-}
-
-.also-cited a:hover {
-  border-bottom-color: var(--accent);
 }
 
 /* ── Footer ──────────────────────────────────────────── */
