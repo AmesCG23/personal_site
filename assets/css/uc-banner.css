@@ -50,14 +50,15 @@ body {
 /* Big blinking headline */
 .uc-headline {
   display: block;
-  font-size: 20px;
-  font-weight: bold;
+  font-family: Impact, 'Arial Narrow', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: normal; /* Impact is already as bold as it gets */
   color: #ffd700;
   text-shadow:
     0 0 6px #ff0,
     0 0 12px #ff0,
     2px 2px 0 #c00;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   animation: uc-blink 1s step-start infinite;
 }
 
