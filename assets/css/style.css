@@ -1,28 +1,301 @@
+:root {
+  --paper: #f3ede1;
+  --ink: #1a1814;
+  --ink-soft: #c9c1b1;
+  --ink-soft-text: #5e564a;
+  --accent: #a8201a;
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --body: 'Source Serif 4', 'Georgia', serif;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #fff;
-  color: #111;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
   line-height: 1.6;
 }
 
 main {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: 56px 72px 64px;
 }
+
+/* ── Portrait ────────────────────────────────────────── */
+
+.portrait {
+  float: right;
+  width: 150px;
+  height: 170px;
+  object-fit: cover;
+  margin-left: 28px;
+  margin-bottom: 16px;
+}
+
+/* ── Name & role ─────────────────────────────────────── */
 
 h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
+  font-family: var(--display);
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
-p {
-  font-size: 1.125rem;
-  color: #444;
+.role {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft-text);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* ── Bio ─────────────────────────────────────────────── */
+
+.bio {
+  margin-top: 22px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ── Rules ───────────────────────────────────────────── */
+
+.rule {
+  position: relative;
+  height: 1px;
+  background: var(--ink);
+  margin: 52px 0 30px;
+}
+
+.rule span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--paper);
+  padding: 0 12px;
+  font-family: var(--body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+
+.rule--clear {
+  clear: both;
+  margin-top: 48px;
+}
+
+/* ── Writing entries ─────────────────────────────────── */
+
+.writing {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.writing article {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 20px;
+  align-items: baseline;
+}
+
+.year {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft-text);
+  font-variant-numeric: tabular-nums;
+  padding-top: 4px;
+}
+
+.entry h2 {
+  font-family: var(--display);
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.entry h2 a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 1px;
+}
+
+.entry h2 a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.dek {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft-text);
+  margin-top: 8px;
+}
+
+.source {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-soft-text);
+  margin-top: 6px;
+}
+
+/* ── Press & Video ───────────────────────────────────── */
+
+.press-video {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 36px;
+  align-items: start;
+}
+
+.quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quotes figure {
+  margin: 0;
+}
+
+.quotes blockquote {
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 1.35;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.quotes figcaption {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-soft-text);
+  margin-top: 8px;
+}
+
+/* Video tile */
+
+.video {
+  margin: 0;
+}
+
+.video-thumb {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1.5px solid var(--ink);
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 9px,
+    var(--ink-soft) 9px 10px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.play {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--ink);
+  padding-left: 2px;
+}
+
+.video figcaption {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft-text);
+  margin-top: 8px;
+}
+
+.video p {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-soft-text);
+  margin-top: 4px;
+}
+
+/* ── Also cited ──────────────────────────────────────── */
+
+.also-cited {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 28px;
+}
+
+.also-cited a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+}
+
+.also-cited a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+
+footer {
+  font-size: 13px;
+  color: var(--ink-soft-text);
+}
+
+footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  main {
+    padding: 40px 24px 48px;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  .portrait {
+    width: 110px;
+    height: 124px;
+    margin-left: 20px;
+  }
+
+  .writing article {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .year {
+    padding-top: 0;
+  }
+
+  .press-video {
+    grid-template-columns: 1fr;
+  }
 }
