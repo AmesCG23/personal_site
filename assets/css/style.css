@@ -190,35 +190,20 @@ h1 {
   margin: 0;
 }
 
-.video-thumb {
-  display: block;
+.video-embed {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 1.5px solid var(--ink);
-  background: repeating-linear-gradient(
-    135deg,
-    transparent 0 9px,
-    var(--ink-soft) 9px 10px
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
 }
 
-.play {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--ink);
-  padding-left: 2px;
+.video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 .video figcaption {
