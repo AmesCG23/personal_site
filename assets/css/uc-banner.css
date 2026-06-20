@@ -1,0 +1,103 @@
+/*
+ * uc-banner.css — Geocities-style Under Construction banner
+ *
+ * TO REMOVE THE BANNER when the site is ready:
+ *   1. Delete this file (assets/css/uc-banner.css)
+ *   2. Delete the <link> tag in index.html that loads this file
+ *   3. Delete the <div id="uc-banner"> block in index.html
+ *
+ * Nothing in style.css or the page's main markup depends on this file.
+ * Those three deletions leave zero trace.
+ */
+
+/* Fixed bar across the top — pushes <main> down via body padding-top */
+body {
+  padding-top: 90px;
+}
+
+#uc-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-align: center;
+  border-bottom: 4px solid #000;
+}
+
+/* Classic construction-tape diagonal stripes */
+.uc-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ffd700 0px,
+    #ffd700 18px,
+    #000    18px,
+    #000    36px
+  );
+  padding: 6px 0;
+}
+
+/* Center panel sits on top of the stripes */
+.uc-body {
+  background: #000;
+  padding: 6px 16px 8px;
+  border-top: 3px solid #ffd700;
+  border-bottom: 3px solid #ffd700;
+}
+
+/* Big blinking headline */
+.uc-headline {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow:
+    0 0 6px #ff0,
+    0 0 12px #ff0,
+    2px 2px 0 #c00;
+  letter-spacing: 0.12em;
+  animation: uc-blink 1s step-start infinite;
+}
+
+@keyframes uc-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Scrolling marquee-style subtext */
+.uc-marquee-wrap {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.uc-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  color: #ff69b4;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  animation: uc-scroll 18s linear infinite;
+}
+
+@keyframes uc-scroll {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+/* Rainbow shimmer on the emoji row */
+.uc-emoji {
+  display: block;
+  font-size: 18px;
+  animation: uc-rainbow 3s linear infinite;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+@keyframes uc-rainbow {
+  0%   { filter: hue-rotate(0deg);   }
+  100% { filter: hue-rotate(360deg); }
+}
