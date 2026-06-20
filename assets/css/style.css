@@ -18,7 +18,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -28,19 +27,25 @@ main {
   padding: 56px 72px 64px;
 }
 
-/* ── Portrait ────────────────────────────────────────── */
+/* Intro */
+
+.intro {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 28px;
+  align-items: start;
+}
+
+/* Portrait */
 
 .portrait {
-  float: right;
   width: 150px;
   height: 170px;
   object-fit: cover;
   object-position: center 30%;
-  margin-left: 28px;
-  margin-bottom: 16px;
 }
 
-/* ── Name & role ─────────────────────────────────────── */
+/* Name & role */
 
 h1 {
   font-family: var(--display);
@@ -58,7 +63,7 @@ h1 {
   font-style: italic;
 }
 
-/* ── Bio ─────────────────────────────────────────────── */
+/* Bio */
 
 .bio {
   margin-top: 22px;
@@ -66,7 +71,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* ── Rules ───────────────────────────────────────────── */
+/* Rules */
 
 .rule {
   position: relative;
@@ -90,11 +95,10 @@ h1 {
 }
 
 .rule--clear {
-  clear: both;
   margin-top: 48px;
 }
 
-/* ── Writing entries ─────────────────────────────────── */
+/* Writing entries */
 
 .writing {
   display: flex;
@@ -150,7 +154,7 @@ h1 {
   margin-top: 6px;
 }
 
-/* ── Press & Video ───────────────────────────────────── */
+/* Press & Video */
 
 .press-video {
   display: grid;
@@ -202,7 +206,7 @@ h1 {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border: 1.5px solid var(--ink);
+  border: 1px solid var(--ink);
 }
 
 .video-embed iframe {
@@ -215,7 +219,7 @@ h1 {
 }
 
 .video figcaption {
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--ink-soft-text);
@@ -229,7 +233,7 @@ h1 {
   margin-top: 4px;
 }
 
-/* ── Footer ──────────────────────────────────────────── */
+/* Footer */
 
 footer {
   font-size: 13px;
@@ -245,7 +249,7 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* Responsive */
 
 @media (max-width: 640px) {
   main {
@@ -259,7 +263,6 @@ footer a:hover {
   .portrait {
     width: 110px;
     height: 124px;
-    margin-left: 20px;
   }
 
   .writing article {
