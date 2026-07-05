@@ -33,6 +33,15 @@ Color tokens (defined in `assets/css/style.css`):
 | `--display` | Cormorant Garamond | Name, article titles, press links |
 | `--body` | Source Serif 4 | Everything else |
 
+## Metadata, SEO & favicon
+
+The `<head>` of `index.html` carries the discoverability layer:
+
+- **Title**: `Ames Grawert · Policy Attorney & Public Affairs Expert`; matching `meta description` and `canonical` (`https://amesgrawert.com/`)
+- **Open Graph + Twitter card**: `og:type profile`, title/description mirroring the meta tags, `og:image` = absolute URL to `assets/img/portrait.jpg` (1200×801), `twitter:card summary_large_image` — so LinkedIn/Bluesky shares unfurl with the portrait
+- **JSON-LD**: `Person` schema (name, jobTitle, worksFor Brennan Center, `sameAs` → LinkedIn/Bluesky/MakerWorld/GitHub) for Google name-search results
+- **Favicon**: "AG" monogram, Cormorant Garamond SemiBold, paper `#f3ede1` on ink `#1a1814`. Three files at repo root: `favicon.svg` (true vector, built from glyph outlines), `favicon.ico` (48/32/16), `apple-touch-icon.png` (180×180). Regenerate by re-running the generator script against the Cormorant Garamond TTF if the palette or monogram changes.
+
 ## Content
 
 All content is live — no placeholders remain.
@@ -61,6 +70,9 @@ Nothing in `style.css` or the main markup depends on any of the above.
 
 ```
 index.html                 Main page
+favicon.svg                Vector favicon ("AG" monogram)
+favicon.ico                Legacy favicon (48/32/16)
+apple-touch-icon.png       iOS home-screen icon (180×180)
 assets/
   css/
     style.css              All page styles + design tokens
