@@ -68,12 +68,12 @@ function buildToolPalette() {
 
   const transitWrap = document.getElementById('tools-transit');
   for (const t of Object.values(TRANSIT_TYPES)) {
-    transitWrap.appendChild(toolButton('transit', t, { color: transitSwatchColor(t.id), name: t.name, costLabel: `$${t.costPerTile}/tile` }));
+    transitWrap.appendChild(toolButton('transit', t, { color: t.color, name: t.name, costLabel: `$${t.costPerTile}/tile` }));
   }
 
   const civicWrap = document.getElementById('tools-civic');
   for (const c of Object.values(CIVIC_BUILDINGS)) {
-    civicWrap.appendChild(toolButton('civic', c, { color: civicSwatchColor(c.id), name: c.name, costLabel: `$${c.cost}` }));
+    civicWrap.appendChild(toolButton('civic', c, { color: c.color, name: c.name, costLabel: `$${c.cost}` }));
   }
 
   const miscWrap = document.getElementById('tools-misc');
@@ -81,7 +81,7 @@ function buildToolPalette() {
   bulldoze.className = 'tool-btn';
   bulldoze.dataset.category = 'bulldoze';
   bulldoze.dataset.id = 'bulldoze';
-  bulldoze.innerHTML = '<span class="swatch" style="background:#a8201a"></span><span class="tool-name">Bulldoze</span><span class="tool-cost">$3/tile</span>';
+  bulldoze.innerHTML = '<span class="swatch" style="background:#f2711c"></span><span class="tool-name">Bulldoze</span><span class="tool-cost">$3/tile</span>';
   bulldoze.addEventListener('click', () => {
     selectedTool = { category: 'bulldoze', id: 'bulldoze' };
     updateSelectedToolUI();
@@ -92,13 +92,6 @@ function buildToolPalette() {
 
   updateSelectedToolUI();
   showToolDetail('zone', ZONE_TYPES.R);
-}
-
-function transitSwatchColor(id) {
-  return { road: '#93897a', trolley: '#c9954a', elevated: '#5e564a', subway: '#2b6fa8', bus: '#6a8f5e', highway: '#1a1814' }[id];
-}
-function civicSwatchColor(id) {
-  return { park: '#5f8f4e', school: '#c9a63f', hospital: '#c94a4a', 'power-plant': '#3a3630', 'fire-station': '#a8201a' }[id];
 }
 
 function updateSelectedToolUI() {

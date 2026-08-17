@@ -13,13 +13,13 @@
 // needsRoad: line can only be built on a tile that already has a road
 export const TRANSIT_TYPES = {
   road: {
-    id: 'road', name: 'Street', mode: 'road',
+    id: 'road', name: 'Street', mode: 'road', color: '#8a97a3',
     unlockYear: 1918, costPerTile: 8, upkeepPerTile: 0.15,
     capacity: 20, speed: 1.0, pollution: 0.4, inducedDemand: false,
     description: 'Paved streets. Required for buses, cars, and zone access.',
   },
   trolley: {
-    id: 'trolley', name: 'Trolley Line', mode: 'rail',
+    id: 'trolley', name: 'Trolley Line', mode: 'rail', color: '#d98a3d',
     unlockYear: 1918, costPerTile: 14, upkeepPerTile: 0.25,
     capacity: 35, speed: 1.1, pollution: 0, inducedDemand: false,
     needsRoad: true,
@@ -27,27 +27,27 @@ export const TRANSIT_TYPES = {
     obsoleteYear: 1957, obsoleteNote: 'Most NYC trolley lines were replaced by buses by 1957.',
   },
   elevated: {
-    id: 'elevated', name: 'Elevated Railway (El)', mode: 'rail',
+    id: 'elevated', name: 'Elevated Railway (El)', mode: 'rail', color: '#6b6558',
     unlockYear: 1918, costPerTile: 30, upkeepPerTile: 0.4,
     capacity: 70, speed: 1.6, pollution: 0, inducedDemand: false,
     blight: true,
     description: 'Steam/electric els on iron trestles. High capacity, fast, but casts shade and noise on the street below (small happiness penalty on tiles directly beneath).',
   },
   subway: {
-    id: 'subway', name: 'Subway', mode: 'rail',
+    id: 'subway', name: 'Subway', mode: 'rail', color: '#2f9fd6',
     unlockYear: 1918, costPerTile: 70, upkeepPerTile: 0.5,
     capacity: 140, speed: 2.2, pollution: 0, inducedDemand: false,
     description: 'Underground rapid transit. Expensive, but fast, high-capacity, and no surface footprint. The IRT has run since 1904.',
   },
   bus: {
-    id: 'bus', name: 'Motor Bus Route', mode: 'road',
+    id: 'bus', name: 'Motor Bus Route', mode: 'road', color: '#5b7a8c',
     unlockYear: 1925, costPerTile: 6, upkeepPerTile: 0.2,
     capacity: 40, speed: 1.2, pollution: 0.2, inducedDemand: false,
     needsRoad: true,
     description: 'Flexible gasoline bus routes running on existing streets. Available once motor buses see wide adoption in the mid-1920s.',
   },
   highway: {
-    id: 'highway', name: 'Expressway', mode: 'road',
+    id: 'highway', name: 'Expressway', mode: 'road', color: '#14212e',
     unlockYear: 1936, costPerTile: 55, upkeepPerTile: 0.6,
     capacity: 160, speed: 2.0, pollution: 1.4, inducedDemand: true,
     canDemolish: true,

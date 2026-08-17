@@ -53,7 +53,9 @@ export function createGrid() {
       }
     }
   }
-  return { w: GRID_W, h: GRID_H, tiles };
+  const grid = { w: GRID_W, h: GRID_H, tiles };
+  jitterCoastline(grid);
+  return grid;
 }
 
 export function tileAt(grid, x, y) {
@@ -64,13 +66,60 @@ export function tileAt(grid, x, y) {
 export function districtTiles(grid, districtId) {
   const d = districtById(districtId);
   const out = [];
-  for (let y = d.rect.y0; y < d.rect.y1; y++) {
-    for (let x = d.rect.x0; x < d.rect.x1; x++) {
+  // Bounds-scan the district's rect padded by 1 tile -- coastline jitter
+  // (see jitterCoastline) can pull a water tile just outside the rect into
+  // this district, so the scan needs a little slack around the edges.
+  // Confirm actual ownership per tile too: shapes are allowed to overlap a
+  // neighbor's rect (a later district in DISTRICTS wins the overlap when
+  // the grid is stamped), so a tile inside this padded box may legitimately
+  // belong to someone else.
+  for (let y = d.rect.y0 - 1; y < d.rect.y1 + 1; y++) {
+    for (let x = d.rect.x0 - 1; x < d.rect.x1 + 1; x++) {
       const t = tileAt(grid, x, y);
-      if (t && t.terrain === 'land') out.push({ x, y, tile: t });
+      if (t && t.terrain === 'land' && t.districtId === districtId) out.push({ x, y, tile: t });
     }
   }
   return out;
+}
+
+// Deterministic per-tile pseudo-random value in [0,1), stable across runs
+// so "New Game" always produces the same coastline.
+function tileHash(x, y, seed) {
+  let h = (x * 374761393 + y * 668265263 + seed * 2147483647) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  h = (h ^ (h >>> 16)) >>> 0;
+  return h / 4294967296;
+}
+
+// Softens the rectangular strips that make up each borough into a jagged
+// coastline: land tiles touching water have a chance to become water, and
+// water tiles touching land have a chance to become land (inheriting the
+// district of a land neighbor). Only ever touches tiles already on a
+// coast, so it can't punch holes deep inland or strand a district.
+function jitterCoastline(grid) {
+  const { w, h, tiles } = grid;
+  const flips = [];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const t = tiles[y][x];
+      const neighborTiles = neighbors4(x, y).map(([nx, ny]) => tileAt(grid, nx, ny)).filter(Boolean);
+      if (t.terrain === 'land') {
+        if (neighborTiles.some(n => n.terrain === 'water') && tileHash(x, y, 101) < 0.22) {
+          flips.push({ x, y, to: 'water' });
+        }
+      } else {
+        const landNeighbor = neighborTiles.find(n => n.terrain === 'land');
+        if (landNeighbor && tileHash(x, y, 101) < 0.22) {
+          flips.push({ x, y, to: 'land', districtId: landNeighbor.districtId });
+        }
+      }
+    }
+  }
+  for (const f of flips) {
+    const t = tiles[f.y][f.x];
+    if (f.to === 'water') { t.terrain = 'water'; t.districtId = null; }
+    else { t.terrain = 'land'; t.districtId = f.districtId; }
+  }
 }
 
 export function neighbors4(x, y) {

@@ -1,10 +1,11 @@
 :root {
-  --paper: #f3ede1;
-  --paper-raised: #fbf8f1;
-  --ink: #1a1814;
-  --ink-soft: #c9c1b1;
-  --ink-soft-text: #5e564a;
-  --accent: #a8201a;
+  /* NYC flag palette: harbor blue, white, Dutch/MTA orange. */
+  --paper: #f5f4f0;
+  --paper-raised: #fbfbf9;
+  --ink: #0d2b52;
+  --ink-soft: #b7c6d6;
+  --ink-soft-text: #3d5570;
+  --accent: #f2711c;
   --display: 'Cormorant Garamond', 'Times New Roman', serif;
   --body: 'Source Serif 4', 'Georgia', serif;
 }
@@ -161,7 +162,7 @@ button {
 #map-viewport {
   flex: 1;
   overflow: auto;
-  background: #7fa0ac;
+  background: #3d6485;
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -183,7 +184,7 @@ button {
   z-index: 50;
 }
 #tile-tooltip.hidden { display: none; }
-#tile-tooltip strong { color: #f0c9a0; }
+#tile-tooltip strong { color: #ffc78a; }
 
 /* ---------------- info panel widgets ---------------- */
 

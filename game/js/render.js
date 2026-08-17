@@ -1,6 +1,6 @@
 import { DISTRICTS, districtById, BOROUGHS } from './data/districts.js';
-import { ZONE_TYPES } from './data/buildings.js';
-import { CROSSINGS } from './data/transit.js';
+import { ZONE_TYPES, CIVIC_BUILDINGS } from './data/buildings.js';
+import { CROSSINGS, TRANSIT_TYPES } from './data/transit.js';
 
 export const TILE_SIZE = 12;
 
@@ -12,27 +12,14 @@ export function initCanvas(canvas, grid) {
   return ctx;
 }
 
-const WATER_LIGHT = '#a9c9d6';
-const WATER_DARK = '#8fb3c2';
-const LAND_BASE = '#d8cfb8';
-const ROAD_COLOR = '#93897a';
-const GRID_LINE = 'rgba(26,24,20,0.04)';
-
-const CIVIC_COLORS = {
-  park: '#5f8f4e',
-  school: '#c9a63f',
-  hospital: '#c94a4a',
-  'power-plant': '#3a3630',
-  'fire-station': '#a8201a',
-};
-
-const TRANSIT_COLORS = {
-  trolley: '#c9954a',
-  elevated: '#5e564a',
-  subway: '#2b6fa8',
-  bus: '#6a8f5e',
-  highway: '#1a1814',
-};
+// NYC flag palette: harbor blue water, warm white land, Dutch orange accent.
+const WATER_LIGHT = '#6fa9c9';
+const WATER_DARK = '#5a93b3';
+const LAND_BASE = '#efece2';
+const ROAD_COLOR = '#8a97a3';
+const GRID_LINE = 'rgba(13,43,82,0.05)';
+const BRIDGE_COLOR = '#1c3a5e';
+const FERRY_COLOR = '#39a6b0';
 
 function shade(hex, amt) {
   const c = hex.replace('#', '');
@@ -123,7 +110,7 @@ export function render(ctx, state, opts = {}) {
     const a = districtById(cr.a), b = districtById(cr.b);
     const ax = ((a.rect.x0 + a.rect.x1) / 2) * T, ay = ((a.rect.y0 + a.rect.y1) / 2) * T;
     const bx = ((b.rect.x0 + b.rect.x1) / 2) * T, by = ((b.rect.y0 + b.rect.y1) / 2) * T;
-    ctx.strokeStyle = cr.mode === 'ferry' ? '#4a8fc9' : '#3a3630';
+    ctx.strokeStyle = cr.mode === 'ferry' ? FERRY_COLOR : BRIDGE_COLOR;
     ctx.lineWidth = cr.mode === 'bridge' ? 2.5 : 2;
     ctx.setLineDash(cr.mode === 'ferry' ? [2, 4] : (cr.mode === 'tunnel' ? [6, 4] : []));
     ctx.beginPath();
@@ -136,7 +123,7 @@ export function render(ctx, state, opts = {}) {
   // --- district labels ---
   if (opts.showLabels) {
     ctx.font = '9px "Source Serif 4", serif';
-    ctx.fillStyle = 'rgba(26,24,20,0.55)';
+    ctx.fillStyle = 'rgba(13,43,82,0.6)';
     ctx.textAlign = 'center';
     for (const d of DISTRICTS) {
       const cx = ((d.rect.x0 + d.rect.x1) / 2) * T;
@@ -147,7 +134,7 @@ export function render(ctx, state, opts = {}) {
 
   // --- hover / selection ---
   if (opts.hover) {
-    ctx.strokeStyle = '#a8201a';
+    ctx.strokeStyle = '#f2711c';
     ctx.lineWidth = 2;
     ctx.strokeRect(opts.hover.x * T + 1, opts.hover.y * T + 1, T - 2, T - 2);
   }
@@ -176,12 +163,12 @@ function drawZoned(ctx, px, py, T, zone, level) {
 }
 
 function drawCivic(ctx, px, py, T, civicId) {
-  const color = CIVIC_COLORS[civicId];
+  const color = CIVIC_BUILDINGS[civicId].color;
   ctx.fillStyle = color;
   ctx.fillRect(px + 1, py + 1, T - 2, T - 2);
-  ctx.strokeStyle = 'rgba(26,24,20,0.5)';
+  ctx.strokeStyle = 'rgba(13,43,82,0.5)';
   ctx.strokeRect(px + 1.5, py + 1.5, T - 3, T - 3);
-  ctx.fillStyle = '#f3ede1';
+  ctx.fillStyle = '#f5f4f0';
   if (civicId === 'park') {
     ctx.beginPath(); ctx.arc(px + T / 2, py + T / 2, T * 0.22, 0, Math.PI * 2); ctx.fill();
   } else if (civicId === 'hospital') {
@@ -198,12 +185,12 @@ function drawCivic(ctx, px, py, T, civicId) {
 }
 
 function drawTransit(ctx, px, py, T, type) {
-  const color = TRANSIT_COLORS[type];
+  const color = TRANSIT_TYPES[type].color;
   ctx.strokeStyle = color;
   if (type === 'highway') {
     ctx.lineWidth = 5;
     ctx.beginPath(); ctx.moveTo(px, py + T / 2); ctx.lineTo(px + T, py + T / 2); ctx.stroke();
-    ctx.strokeStyle = '#f3ede1'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 2]);
+    ctx.strokeStyle = '#f5f4f0'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 2]);
     ctx.beginPath(); ctx.moveTo(px, py + T / 2); ctx.lineTo(px + T, py + T / 2); ctx.stroke();
     ctx.setLineDash([]);
   } else if (type === 'subway') {

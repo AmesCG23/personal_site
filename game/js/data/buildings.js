@@ -4,9 +4,9 @@
 // and a base land value it needs to grow to the next level.
 
 export const ZONE_TYPES = {
-  R: { id: 'R', name: 'Residential', color: '#7fae6a', costPerTile: 4 },
-  C: { id: 'C', name: 'Commercial',  color: '#4a8fc9', costPerTile: 6 },
-  I: { id: 'I', name: 'Industrial',  color: '#c9954a', costPerTile: 5 },
+  R: { id: 'R', name: 'Residential', color: '#5f9e5a', costPerTile: 4 },
+  C: { id: 'C', name: 'Commercial',  color: '#2f8f9c', costPerTile: 6 },
+  I: { id: 'I', name: 'Industrial',  color: '#b06a2f', costPerTile: 5 },
 };
 
 // Capacity (pop units) per devLevel, by zone type.
@@ -37,27 +37,27 @@ export const CHARACTER_TRAITS = {
 
 export const CIVIC_BUILDINGS = {
   park: {
-    id: 'park', name: 'Park', cost: 12, upkeep: 0.1, radius: 4,
+    id: 'park', name: 'Park', color: '#4f8f3f', cost: 12, upkeep: 0.1, radius: 4,
     effect: { happiness: 0.12, landValue: 0.08 },
     description: 'Green space. Boosts happiness and land value nearby. No service coverage.',
   },
   school: {
-    id: 'school', name: 'School', cost: 25, upkeep: 0.35, radius: 6,
+    id: 'school', name: 'School', color: '#d4af37', cost: 25, upkeep: 0.35, radius: 6,
     effect: { happiness: 0.1, growthBonus: 0.15 },
     description: 'Boosts happiness and lets residential zones grow further within its radius.',
   },
   hospital: {
-    id: 'hospital', name: 'Hospital', cost: 40, upkeep: 0.5, radius: 7,
+    id: 'hospital', name: 'Hospital', color: '#c94a4a', cost: 40, upkeep: 0.5, radius: 7,
     effect: { happiness: 0.14 },
     description: 'Boosts happiness within its radius; reduces the impact of pollution nearby.',
   },
   'power-plant': {
-    id: 'power-plant', name: 'Power Plant', cost: 60, upkeep: 0.6, radius: 20,
+    id: 'power-plant', name: 'Power Plant', color: '#263544', cost: 60, upkeep: 0.6, radius: 20,
     effect: { happiness: -0.08, pollution: 1.2, powersCity: true },
     description: 'Coal-fired power plant. Required for zones beyond devLevel 1 to grow anywhere in the city, but pollutes nearby tiles.',
   },
   'fire-station': {
-    id: 'fire-station', name: 'Fire & Police Station', cost: 30, upkeep: 0.3, radius: 8,
+    id: 'fire-station', name: 'Fire & Police Station', color: '#7a1f1f', cost: 30, upkeep: 0.3, radius: 8,
     effect: { happiness: 0.08, landValue: 0.05 },
     description: 'Public safety coverage. Boosts happiness and land value within its radius.',
   },
