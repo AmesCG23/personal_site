@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Five Boroughs, 1918 &middot; A City-Builder &middot; Ames Grawert</title>
+  <meta name="description" content="A browser city-builder about growing New York, 1918-1981, one subway line, expressway, and zoning decision at a time." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+
+  <header id="top-bar">
+    <div id="top-bar-left">
+      <a href="/" id="back-link" title="Back to amesgrawert.com">&larr; amesgrawert.com</a>
+      <h1>Five Boroughs, <span id="year-display">1918</span></h1>
+    </div>
+    <div id="top-bar-stats">
+      <div class="stat"><span class="stat-label">Population</span><span class="stat-value" id="stat-population">&mdash;</span></div>
+      <div class="stat"><span class="stat-label">Happiness</span><span class="stat-value" id="stat-happiness">&mdash;</span></div>
+      <div class="stat"><span class="stat-label">Treasury</span><span class="stat-value" id="stat-treasury">&mdash;</span></div>
+      <div class="stat"><span class="stat-label">Metro Score</span><span class="stat-value" id="stat-score">&mdash;</span></div>
+    </div>
+    <div id="top-bar-controls">
+      <div id="speed-controls" role="group" aria-label="Simulation speed">
+        <button data-speed="0" title="Pause">&#10073;&#10073;</button>
+        <button data-speed="1" class="active" title="Normal speed">&#9654;</button>
+        <button data-speed="2" title="Fast">&#9654;&#9654;</button>
+        <button data-speed="3" title="Fastest">&#9654;&#9654;&#9654;</button>
+      </div>
+      <button id="btn-save" title="Save game">Save</button>
+      <button id="btn-load" title="Load game">Load</button>
+      <button id="btn-help" title="How to play">?</button>
+    </div>
+  </header>
+
+  <div id="game-body">
+
+    <aside id="tool-panel">
+      <div class="panel-section">
+        <h2>Zone</h2>
+        <div class="tool-grid" id="tools-zone"></div>
+      </div>
+      <div class="panel-section">
+        <h2>Transit</h2>
+        <div class="tool-grid" id="tools-transit"></div>
+      </div>
+      <div class="panel-section">
+        <h2>Civic</h2>
+        <div class="tool-grid" id="tools-civic"></div>
+      </div>
+      <div class="panel-section">
+        <h2>Tools</h2>
+        <div class="tool-grid" id="tools-misc"></div>
+      </div>
+      <div class="panel-section" id="tool-detail">
+        <p class="muted">Select a tool, then click a tile on the map.</p>
+      </div>
+      <div class="panel-section">
+        <h2>Map layers</h2>
+        <label class="checkbox-row"><input type="checkbox" id="opt-pollution" /> Pollution overlay</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-labels" /> District labels</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-tint" checked /> Borough tint</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-grid" /> Tile grid</label>
+      </div>
+    </aside>
+
+    <main id="map-viewport">
+      <canvas id="map-canvas"></canvas>
+      <div id="tile-tooltip" class="hidden"></div>
+    </main>
+
+    <aside id="info-panel">
+      <div class="panel-section">
+        <h2>City demand</h2>
+        <div class="demand-row"><span class="demand-label" style="color:#7fae6a">R</span><div class="demand-bar"><div class="demand-fill" id="demand-R"></div></div></div>
+        <div class="demand-row"><span class="demand-label" style="color:#4a8fc9">C</span><div class="demand-bar"><div class="demand-fill" id="demand-C"></div></div></div>
+        <div class="demand-row"><span class="demand-label" style="color:#c9954a">I</span><div class="demand-bar"><div class="demand-fill" id="demand-I"></div></div></div>
+      </div>
+
+      <div class="panel-section">
+        <h2>Budget</h2>
+        <div class="kv"><span>Tax rate</span><span id="tax-rate-value">8%</span></div>
+        <input type="range" id="tax-rate-slider" min="0" max="30" value="8" />
+        <div class="kv"><span>Monthly revenue</span><span id="budget-revenue">&mdash;</span></div>
+        <div class="kv"><span>Monthly upkeep</span><span id="budget-upkeep">&mdash;</span></div>
+      </div>
+
+      <div class="panel-section" id="district-panel">
+        <h2>District</h2>
+        <p class="muted">Click a tile to inspect its district.</p>
+      </div>
+
+      <div class="panel-section" id="log-section">
+        <h2>City record</h2>
+        <ul id="event-log"></ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Event choice modal -->
+  <div id="event-modal" class="modal-backdrop hidden">
+    <div class="modal">
+      <h2 id="event-modal-year"></h2>
+      <h3 id="event-modal-title"></h3>
+      <p id="event-modal-body"></p>
+      <div id="event-modal-options"></div>
+    </div>
+  </div>
+
+  <!-- Final report modal -->
+  <div id="final-modal" class="modal-backdrop hidden">
+    <div class="modal">
+      <h2>1981: End of the Classic Era</h2>
+      <div id="final-report-body"></div>
+      <button id="final-continue-btn">Continue in Free Play &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Save/Load modal -->
+  <div id="saveload-modal" class="modal-backdrop hidden">
+    <div class="modal">
+      <h2 id="saveload-title">Save Game</h2>
+      <div id="saveload-slots"></div>
+      <button id="saveload-close" class="secondary">Close</button>
+    </div>
+  </div>
+
+  <!-- Help / about modal -->
+  <div id="help-modal" class="modal-backdrop hidden">
+    <div class="modal modal-wide">
+      <h2>How to Play</h2>
+      <div class="help-body">
+        <p><strong>Goal.</strong> Grow New York from 1918 to 1981 (and beyond) &mdash; maximize population while keeping residents happy. Your Metro Score rewards both.</p>
+        <p><strong>Zoning.</strong> Paint Residential, Commercial, and Industrial zones on streets. Zoned lots develop on their own when demand, transit access, and land value support it &mdash; watch the R/C/I demand bars.</p>
+        <p><strong>Power.</strong> Build at least one Power Plant before zones can grow past their first stage.</p>
+        <p><strong>Transit.</strong> Streets, trolleys, and els are available from 1918; motor buses arrive in the mid-1920s; expressways unlock in 1936. Subways and els are fast and clean but expensive; expressways are cheap to move a lot of cars but reliably fill back up with new car trips (<em>induced demand</em>), raise pollution, and can pave straight through a developed neighborhood &mdash; bulldozing whoever was living there, Robert Moses style.</p>
+        <p><strong>History.</strong> Real events fire on their historical years, including a few consequential choices (1936 Moses, 1948 Cross-Bronx Expressway, 1956 Interstate Highway Act, 1962 Lower Manhattan Expressway, 1975 fiscal crisis). Figures and dates are simplified for gameplay, grounded in real NYC history but not a rigorous simulation.</p>
+        <p><strong>Saving.</strong> The game autosaves periodically and on major choices. Use Save/Load for named slots &mdash; everything lives in this browser only.</p>
+      </div>
+      <button id="help-close" class="secondary">Close</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
