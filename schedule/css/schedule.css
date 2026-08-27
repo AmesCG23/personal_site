@@ -1,0 +1,183 @@
+:root {
+  --paper: #f3ede1;
+  --ink: #1a1814;
+  --ink-soft: #c9c1b1;
+  --ink-soft-text: #5e564a;
+  --accent: #a8201a;
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --body: 'Source Serif 4', 'Georgia', serif;
+  --heat: 58, 107, 66; /* forest green, used at varying alpha for the heatmap */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  line-height: 1.6;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+#back-link {
+  display: inline-block;
+  color: var(--ink-soft-text);
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+#back-link:hover {
+  color: var(--accent);
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--ink-soft-text);
+  font-size: 15px;
+  margin-top: 8px;
+  margin-bottom: 28px;
+}
+
+.status-msg {
+  color: var(--ink-soft-text);
+  font-size: 14px;
+}
+
+.error-banner {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: rgba(168, 32, 26, 0.06);
+  padding: 14px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.name-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.name-row label {
+  font-size: 13px;
+  color: var(--ink-soft-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.name-row input {
+  font-family: var(--body);
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--ink-soft);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 4px;
+}
+
+.name-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.days-grid {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--ink-soft);
+}
+
+.day-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 72px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--ink-soft);
+}
+
+.day-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.day-label {
+  font-size: 16px;
+}
+
+.heat-cell {
+  position: relative;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink);
+  padding: 6px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--ink-soft);
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+.heat-cell:hover::after,
+.heat-cell:focus::after,
+.heat-cell:focus-visible::after {
+  content: attr(data-names);
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 5;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: pre-line;
+  width: max-content;
+  max-width: 220px;
+  text-align: left;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#submit-btn {
+  margin-top: 24px;
+  font-family: var(--body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--ink);
+  border: none;
+  padding: 12px 22px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#submit-btn:hover {
+  background: var(--accent);
+}
+
+#submit-btn:disabled {
+  background: var(--ink-soft);
+  cursor: not-allowed;
+}
+
+#save-status {
+  margin-top: 12px;
+}
