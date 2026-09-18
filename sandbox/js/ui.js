@@ -193,7 +193,10 @@ function anthemRowHtml(def) {
     extra += `<div class="row"><input type="text" list="dl-creature-types" placeholder="Creature type, e.g. Goblin" value="${esc(v.type || "")}" data-type="${def.key}" class="grow" /></div>`;
   }
   if (on && def.scaling) {
-    extra += `<div class="row"><label class="note">Charge counters</label><input type="number" min="0" value="${v.counters || 0}" data-counters="${def.key}" style="width:80px" /></div>`;
+    const label = def.snapshotCount ? "Fellowship counters" : "Charge counters";
+    const snapshotBtn = def.snapshotCount && v.type
+      ? `<button class="btn" data-snapshot="${esc(def.key)}">Match board count</button>` : "";
+    extra += `<div class="row"><label class="note">${label}</label><input type="number" min="0" value="${v.counters || 0}" data-counters="${def.key}" style="width:80px" />${snapshotBtn}</div>`;
   }
   if (on && def.autoLifeCheck) {
     const sl = S.state.startingLife ?? 40;
@@ -223,15 +226,25 @@ export function anthemsSheet() {
   b.scrollTop = scrollTop;
   b.onclick = (e) => {
     const t = e.target.closest("[data-toggle]");
-    if (!t) return;
-    S.setEffectOn(t.dataset.toggle, !S.isEffectOn(t.dataset.toggle));
-    anthemsSheet();
+    const snap = e.target.closest("[data-snapshot]");
+    if (t) { S.setEffectOn(t.dataset.toggle, !S.isEffectOn(t.dataset.toggle)); anthemsSheet(); return; }
+    if (snap) {
+      const key = snap.dataset.snapshot;
+      const type = (S.state.effects[key] || {}).type;
+      if (!type) return;
+      const n = S.state.stacks.reduce((sum, s) => sum + (s.is_creature && s.subtypes.some((st) => st.toLowerCase() === type.toLowerCase()) ? s.count : 0), 0);
+      S.setEffectCounters(key, n);
+      anthemsSheet();
+      toast(`Set to ${n}, matching the ${type} tokens on your board right now.`);
+    }
   };
   b.onchange = (e) => {
     const ti = e.target.closest("[data-type]");
     const ci = e.target.closest("[data-counters]");
     const sl = e.target.closest("[data-startlife]");
-    if (ti) S.setEffectType(ti.dataset.type, ti.value.trim());
+    // Re-render after a type change: it can add or remove the "Match board count" button
+    // (Banner of Kinship) and the "leaves other types alone" bits of the label elsewhere.
+    if (ti) { S.setEffectType(ti.dataset.type, ti.value.trim()); anthemsSheet(); }
     else if (ci) S.setEffectCounters(ci.dataset.counters, +ci.value);
     else if (sl) S.setStartingLife(+sl.value);
   };
@@ -634,7 +647,7 @@ export function aboutSheet() {
   openSheet("About Token Table", `<div class="about">
     <p><b>How to use it.</b> Tap a name to make a token. Tap the card to tap or untap it. Hold the card (or press ⋯) for split, duplicate, art, edit and sacrifice. “Next turn” untaps everything and clears summoning sickness. Hold the life buttons for ±5; hold a mana pip to add one, tap it to spend one.</p>
     <p><b>What it knows.</b> ${meta ? meta.count : "—"} kinds of token from the community-maintained Cockatrice Magic-Token list (version ${meta ? esc(meta.version) : "—"}), with their usual power, toughness, colour and rules text. Treasure, Food, Clue and the other predefined tokens follow Comprehensive Rules 111.10.</p>
-    <p><b>Anthems &amp; effects.</b> Under ⋯, flip on Glorious Anthem, Coat of Arms, a tribal lord and the rest of the fourteen common anthem enchantments and artifacts; the bonus is folded straight into every token's power/toughness, marked with a ⚡.</p>
+    <p><b>Anthems &amp; effects.</b> Under ⋯, flip on Glorious Anthem, Coat of Arms, a tribal lord and the rest of the sixteen common anthem enchantments and artifacts; the bonus is folded straight into every token's power/toughness, marked with a ⚡.</p>
     <p><b>Where it keeps things.</b> Only on this device. Nothing is sent anywhere except requests to Scryfall for card art and artist names.</p>
     <p class="note">Token Table is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. © Wizards of the Coast LLC.</p>
     <p class="note">Card images and data courtesy of Scryfall (scryfall.com). Token definitions from the Cockatrice Magic-Token project. Rules text from the Magic: The Gathering Comprehensive Rules. Artwork is credited to its illustrator wherever shown.</p>

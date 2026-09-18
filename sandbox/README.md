@@ -9,14 +9,14 @@ A token tray for Magic: The Gathering that runs in the browser on an iPad or iPh
 - **Power / toughness:** the +1/+1 and −1/−1 buttons add counters; one of each cancels out, and a creature at 0 toughness shows a red warning.
 - **Next turn:** untaps everything and clears the "zzz" summoning-sickness marker.
 - **Sacrifice:** Treasure, Food, Clue, Blood, Map, Powerstone and the other predefined tokens show their cost and payoff, and can add mana or life to the tray at the bottom.
-- **Anthems & effects** (under ⋯): flip on Glorious Anthem, Coat of Arms, a tribal lord, Bad Moon and 10 other common anthem enchantments/artifacts. The bonus is folded straight into every token's power/toughness, marked with a ⚡. Active ones also show as a strip under the header — tap one there to turn it off.
+- **Anthems & effects** (under ⋯): flip on Glorious Anthem, Coat of Arms, a tribal lord, Bad Moon and 12 other common anthem enchantments/artifacts. The bonus is folded straight into every token's power/toughness, marked with a ⚡. Active ones also show as a strip under the header — tap one there to turn it off.
 - **Undo** covers the last 30 actions. **New game** is under ⋯ in the header, with "keep the screen awake" and credits.
 - **Install:** Safari → Share → Add to Home Screen. Everything is saved on the device.
 
 ## Files
 
 - `index.html`, `css/tokens.css`, `manifest.webmanifest`, `icons/`
-- `js/app.js` (entry), `js/state.js` (board, undo, and the anthem power/toughness math), `js/ui.js` (rendering, touch, sheets), `js/catalog.js`, `js/scryfall.js`, `js/store.js`, `js/reminders.js`, `js/anthems.js` (the 14 anthem definitions)
+- `js/app.js` (entry), `js/state.js` (board, undo, and the anthem power/toughness math), `js/ui.js` (rendering, touch, sheets), `js/catalog.js`, `js/scryfall.js`, `js/store.js`, `js/reminders.js`, `js/anthems.js` (the 16 anthem definitions)
 - `data/tokens.json` — the token catalog, built by `../docs/mtg-tokens/build-token-catalog.py`
 - `tests/smoke.mjs` — Playwright smoke test; `tests/make-icons.mjs` — renders the icon PNGs
 
@@ -33,7 +33,7 @@ node sandbox/tests/smoke.mjs                    # needs Playwright + Chromium
 - A sacrifice and its payoff (for example Treasure → red mana) are one undo step.
 - Tapping a palette name twice in the same turn adds to the existing stack instead of making a second one, as long as the two would be identical.
 - Still unverified from the build sandbox (its network blocks Scryfall): live Scryfall calls from a browser, and the artist-name enrichment script. The app degrades to blank tokens and the bundled catalog if Scryfall is unreachable, and fetches artist names on demand until the catalog is enriched.
-- Anthems added 2026-09-18: 14 common anthem enchantments/artifacts (`js/anthems.js`), toggled under ⋯ → "Anthems & effects". Global, color, tribal (choose-a-type) and Coat of Arms's cross-type count all recompute live from the tokens on the board. Path of Bravery's own condition (life ≥ starting life) is checked automatically against the life tray; Beastmaster Ascension has no equivalent state to check against, so it's a plain manual switch. This app only tracks your own board, so a "symmetric" card like Bad Moon (which really pumps every black creature, opponents' included) only ever affects what's shown here.
+- Anthems added 2026-09-18, 14 cards; extended 2026-09-19 to 16 with Banner of Kinship and Chronicle of Victory: common anthem enchantments/artifacts (`js/anthems.js`), toggled under ⋯ → "Anthems & effects". Global, color, tribal (choose-a-type) and Coat of Arms's cross-type count all recompute live from the tokens on the board. Path of Bravery's own condition (life ≥ starting life) is checked automatically against the life tray; Beastmaster Ascension has no equivalent state to check against, so it's a plain manual switch. This app only tracks your own board, so a "symmetric" card like Bad Moon (which really pumps every black creature, opponents' included) only ever affects what's shown here.
 
 ## Credits
 
