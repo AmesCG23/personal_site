@@ -5,6 +5,7 @@ import * as C from "./catalog.js";
 import * as SF from "./scryfall.js";
 import { blobUrl, putBlob, shrinkImage, loadPrefs, savePrefs } from "./store.js";
 import { reminderFor } from "./reminders.js";
+import { ANTHEMS, GROUP_LABELS, GROUP_ORDER } from "./anthems.js";
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -67,7 +68,12 @@ const uploadUrls = new Map();
 function ptHtml(s) {
   if (s.base_power == null) return "";
   const p = S.power(s), t = S.toughness(s);
-  return `<div class="pt ${S.isDead(s) ? "dead" : ""}" title="${S.isDead(s) ? "Toughness 0 or less: this creature dies (rule 704.5f)" : "Power / toughness"}">${esc(p)}/${esc(t)}</div>`;
+  const ab = S.anthemBonus(s);
+  const boosted = ab.p || ab.t;
+  const title = S.isDead(s) ? "Toughness 0 or less: this creature dies (rule 704.5f)"
+    : boosted ? `Includes +${ab.p}/+${ab.t} from active anthem effects — see ⋯ → Anthems & effects`
+    : "Power / toughness";
+  return `<div class="pt ${S.isDead(s) ? "dead" : ""} ${boosted ? "boosted" : ""}" title="${esc(title)}">${boosted ? "⚡" : ""}${esc(p)}/${esc(t)}</div>`;
 }
 function countersHtml(s) {
   const chips = [];
@@ -150,6 +156,85 @@ export function renderChrome(state) {
     `<button class="pip pip-${c.toLowerCase()} ${state.mana[c] ? "" : "zero"}" data-mana="${c}" aria-label="${COLOR_NAMES[c]} mana: ${state.mana[c]}. Tap to spend one, hold to add one.">${c === "C" ? "◇" : c}<span class="n">${state.mana[c]}</span></button>`).join("");
   const sum = S.summary();
   $("#summary").textContent = `Turn ${state.turn}${sum ? " · " + sum : ""}`;
+}
+
+// ---------------------------------------------------------------- anthems & effects
+function effectLabel(key, def, v) {
+  let label = def.name;
+  if (def.needsType) label += v.type ? `: ${v.type}` : " (pick a type)";
+  if (def.scaling) label += ` +${v.counters || 0}`;
+  if (def.autoLifeCheck) label += S.state.life >= (S.state.startingLife ?? 40) ? " (active)" : " (life too low)";
+  return label;
+}
+export function renderEffectsStrip(state) {
+  const strip = $("#effects-strip");
+  const list = S.activeEffects();
+  if (!list.length) { strip.hidden = true; strip.innerHTML = ""; return; }
+  strip.hidden = false;
+  strip.innerHTML = list.map(({ key, def, v }) =>
+    `<button class="chip chip-anthem" data-off="${esc(key)}" title="Tap to turn off">⚡ ${esc(effectLabel(key, def, v))}</button>`
+  ).join("") + `<button class="chip chip-action" id="chip-anthems-more">Anthems&hellip;</button>`;
+}
+export function bindEffectsStrip() {
+  $("#effects-strip").addEventListener("click", (e) => {
+    const off = e.target.closest("[data-off]");
+    if (off) { S.setEffectOn(off.dataset.off, false); return; }
+    if (e.target.closest("#chip-anthems-more")) anthemsSheet();
+  });
+}
+
+function anthemRowHtml(def) {
+  const v = S.state.effects[def.key] || {};
+  const on = !!v.on;
+  // Only show a subtitle when it says something the row title doesn't already.
+  const cardsNote = def.cards.filter((c) => c !== def.name).join(" / ");
+  let extra = "";
+  if (on && def.needsType) {
+    extra += `<div class="row"><input type="text" list="dl-creature-types" placeholder="Creature type, e.g. Goblin" value="${esc(v.type || "")}" data-type="${def.key}" class="grow" /></div>`;
+  }
+  if (on && def.scaling) {
+    extra += `<div class="row"><label class="note">Charge counters</label><input type="number" min="0" value="${v.counters || 0}" data-counters="${def.key}" style="width:80px" /></div>`;
+  }
+  if (on && def.autoLifeCheck) {
+    const sl = S.state.startingLife ?? 40;
+    const active = S.state.life >= sl;
+    extra += `<div class="row"><label class="note">Starting life</label><input type="number" value="${sl}" data-startlife style="width:80px" /><span class="note">${active ? "Active right now" : "Not active right now"} (life ${S.state.life})</span></div>`;
+  }
+  return `<div class="anthem-row">
+    <button class="toggle ${on ? "on" : ""}" data-toggle="${esc(def.key)}" role="switch" aria-checked="${on}" aria-label="${on ? "Turn off" : "Turn on"} ${esc(def.name)}"></button>
+    <div class="anthem-row-body">
+      <div class="anthem-row-name">${esc(def.name)}${cardsNote ? ` <small>${esc(cardsNote)}</small>` : ""}</div>
+      <p class="note">${esc(def.text)}</p>
+      ${extra}
+    </div>
+  </div>`;
+}
+export function anthemsSheet() {
+  const scrollTop = $("#sheet").hidden ? 0 : $("#sheet-body").scrollTop;
+  const types = C.allSubtypes();
+  const datalist = `<datalist id="dl-creature-types">${types.map((t) => `<option value="${esc(t)}">`).join("")}</datalist>`;
+  const groups = GROUP_ORDER.map((g) => {
+    const defs = ANTHEMS.filter((a) => a.group === g);
+    return `<div class="section-title">${esc(GROUP_LABELS[g])}</div>${defs.map(anthemRowHtml).join("")}`;
+  }).join("");
+  const b = openSheet("Anthems & effects", `
+    <p class="note">Turn on the ones in play. The bonus is folded straight into every token's power/toughness — look for the ⚡ mark on a card.</p>
+    ${datalist}${groups}`);
+  b.scrollTop = scrollTop;
+  b.onclick = (e) => {
+    const t = e.target.closest("[data-toggle]");
+    if (!t) return;
+    S.setEffectOn(t.dataset.toggle, !S.isEffectOn(t.dataset.toggle));
+    anthemsSheet();
+  };
+  b.onchange = (e) => {
+    const ti = e.target.closest("[data-type]");
+    const ci = e.target.closest("[data-counters]");
+    const sl = e.target.closest("[data-startlife]");
+    if (ti) S.setEffectType(ti.dataset.type, ti.value.trim());
+    else if (ci) S.setEffectCounters(ci.dataset.counters, +ci.value);
+    else if (sl) S.setStartingLife(+sl.value);
+  };
 }
 
 // ---------------------------------------------------------------- board events
@@ -522,8 +607,10 @@ export function reapplyWake() { if (loadPrefs().wake && document.visibilityState
 
 export function moreMenu() {
   const prefs = loadPrefs();
+  const count = S.activeEffectCount();
   const b = openSheet("Token Table", `
     <div class="menu">
+      <button class="btn" data-m="anthems">Anthems &amp; effects&hellip; <small>${count ? `${count} active` : ""}</small></button>
       <button class="btn" data-m="untap">Untap everything <small>keeps the turn</small></button>
       <button class="btn" data-m="clearmana">Empty the mana pool</button>
       <button class="btn" data-m="wake">${prefs.wake ? "Stop keeping" : "Keep"} the screen awake <small>${"wakeLock" in navigator ? "" : "not supported here"}</small></button>
@@ -533,7 +620,8 @@ export function moreMenu() {
   b.onclick = async (e) => {
     const m = e.target.closest("[data-m]"); if (!m) return;
     const k = m.dataset.m;
-    if (k === "untap") { S.untapAll(); closeSheet(); }
+    if (k === "anthems") anthemsSheet();
+    else if (k === "untap") { S.untapAll(); closeSheet(); }
     else if (k === "clearmana") { S.clearMana(); closeSheet(); }
     else if (k === "wake") { const ok = await applyWake(!prefs.wake); closeSheet(); toast(ok ? (prefs.wake ? "Screen may sleep again." : "Screen will stay awake while this page is open.") : "Wake lock isn't available in this browser."); }
     else if (k === "about") aboutSheet();
@@ -546,6 +634,7 @@ export function aboutSheet() {
   openSheet("About Token Table", `<div class="about">
     <p><b>How to use it.</b> Tap a name to make a token. Tap the card to tap or untap it. Hold the card (or press ⋯) for split, duplicate, art, edit and sacrifice. “Next turn” untaps everything and clears summoning sickness. Hold the life buttons for ±5; hold a mana pip to add one, tap it to spend one.</p>
     <p><b>What it knows.</b> ${meta ? meta.count : "—"} kinds of token from the community-maintained Cockatrice Magic-Token list (version ${meta ? esc(meta.version) : "—"}), with their usual power, toughness, colour and rules text. Treasure, Food, Clue and the other predefined tokens follow Comprehensive Rules 111.10.</p>
+    <p><b>Anthems &amp; effects.</b> Under ⋯, flip on Glorious Anthem, Coat of Arms, a tribal lord and the rest of the fourteen common anthem enchantments and artifacts; the bonus is folded straight into every token's power/toughness, marked with a ⚡.</p>
     <p><b>Where it keeps things.</b> Only on this device. Nothing is sent anywhere except requests to Scryfall for card art and artist names.</p>
     <p class="note">Token Table is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. © Wizards of the Coast LLC.</p>
     <p class="note">Card images and data courtesy of Scryfall (scryfall.com). Token definitions from the Cockatrice Magic-Token project. Rules text from the Magic: The Gathering Comprehensive Rules. Artwork is credited to its illustrator wherever shown.</p>

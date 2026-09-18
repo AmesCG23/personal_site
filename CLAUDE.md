@@ -92,7 +92,7 @@ CNAME                      Custom domain (amesgrawert.com)
 
 A Magic: The Gathering token tray for iPad/iPhone, linked from the footer as "Sandbox". Static, no build step, vanilla ES modules. Plan and research: `docs/mtg-tokens/HANDOFF.md`.
 
-- `sandbox/index.html`, `sandbox/css/tokens.css`, `sandbox/js/` (`app.js` entry; `state.js` board + undo; `ui.js` rendering and sheets; `catalog.js` token lookup; `scryfall.js` API client; `store.js` localStorage + IndexedDB; `reminders.js` sacrifice text)
+- `sandbox/index.html`, `sandbox/css/tokens.css`, `sandbox/js/` (`app.js` entry; `state.js` board, undo, and the anthem power/toughness math; `ui.js` rendering and sheets; `catalog.js` token lookup; `scryfall.js` API client; `store.js` localStorage + IndexedDB; `reminders.js` sacrifice text; `anthems.js` the 14 anthem enchantment/artifact definitions, toggled under ⋯ → "Anthems & effects")
 - `sandbox/data/tokens.json` — token catalog (834 token shapes, Scryfall printing ids). Regenerate with `python3 docs/mtg-tokens/build-token-catalog.py --out sandbox/data/tokens.json`; then optionally `node docs/mtg-tokens/enrich-from-scryfall.mjs sandbox/data/tokens.json` on a machine that can reach api.scryfall.com to fill in artist names.
 - `sandbox/manifest.webmanifest` + `sandbox/icons/` — home-screen install. Regenerate PNG icons with `node sandbox/tests/make-icons.mjs` after editing `icon.svg`.
 - `sandbox/tests/smoke.mjs` — Playwright smoke test (run a static server on the repo root at port 8123, then `node sandbox/tests/smoke.mjs`). Stubs Scryfall; checks the handoff's worked scenario, layout at phone/tablet sizes, 44 px hit targets.

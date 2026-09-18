@@ -21,6 +21,16 @@ export async function loadCatalog(url = "data/tokens.json") {
 }
 
 export const catalogMeta = () => data ? { count: data.count, version: data.source_version, generated: data.generated_at } : null;
+// Every creature type in the catalog, for the anthem type-picker's autocomplete.
+let subtypeList = null;
+export function allSubtypes() {
+  if (!subtypeList) {
+    const set = new Set();
+    for (const t of data.tokens) for (const st of t.subtypes) if (t.is_creature) set.add(st);
+    subtypeList = [...set].sort();
+  }
+  return subtypeList;
+}
 export const record = (id) => byId.get(id) || null;
 export const defaultFor = (name) => firstByName.get(String(name).toLowerCase()) || null;
 export const quickList = () => QUICK.map(defaultFor).filter(Boolean);
