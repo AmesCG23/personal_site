@@ -1,0 +1,16 @@
+{
+  "name": "Token Table",
+  "short_name": "Tokens",
+  "description": "A Magic: The Gathering token tray for the table.",
+  "start_url": "/sandbox/",
+  "scope": "/sandbox/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3ede1",
+  "theme_color": "#f3ede1",
+  "icons": [
+    { "src": "/sandbox/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/sandbox/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/sandbox/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

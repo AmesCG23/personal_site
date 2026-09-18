@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Token Table &middot; Ames Grawert</title>
+  <meta name="description" content="A token tray for Magic: The Gathering. Create, tap, stack, split and sacrifice tokens on an iPad or iPhone." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#f3ede1" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/sandbox/icons/icon-180.png" />
+  <link rel="manifest" href="/sandbox/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Token Table" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+</head>
+<body>
+
+  <header id="top">
+    <div class="top-left">
+      <a href="/" id="back-link" title="Back to amesgrawert.com">&larr; amesgrawert.com</a>
+      <h1>Token Table</h1>
+    </div>
+    <div class="top-right">
+      <span id="turn" class="turn" aria-live="polite">Turn 1</span>
+      <button id="btn-undo" class="btn" title="Undo the last action" disabled>Undo</button>
+      <button id="btn-next" class="btn btn-primary" title="Untap everything and start your next turn">Next turn &#9654;</button>
+      <button id="btn-more" class="btn btn-icon" title="More" aria-label="More options">&#8943;</button>
+    </div>
+  </header>
+
+  <div id="app">
+    <aside id="palette" aria-label="Create a token">
+      <div id="palette-quick" class="palette-row">
+        <span id="palette-chips" class="chips"></span>
+        <button class="chip chip-action" id="btn-any">Any token&hellip;</button>
+        <button class="chip chip-action" id="btn-custom">Custom&hellip;</button>
+      </div>
+    </aside>
+
+    <main id="board" aria-label="Your tokens">
+      <p id="board-empty" class="empty">No tokens yet. Tap a name below (or on the left) to create one.</p>
+      <div id="stacks" class="stacks"></div>
+    </main>
+
+    <footer id="tray" aria-label="Life and mana">
+      <div class="tray-life">
+        <button class="btn btn-icon" id="life-minus" aria-label="Lose 1 life (hold for 5)">&minus;</button>
+        <span class="life"><span id="life">40</span><small>life</small></span>
+        <button class="btn btn-icon" id="life-plus" aria-label="Gain 1 life (hold for 5)">+</button>
+      </div>
+      <div class="tray-mana" id="mana" role="group" aria-label="Mana pool. Tap a pip to spend one; hold to add one.">
+      </div>
+      <p id="summary" class="summary"></p>
+    </footer>
+  </div>
+
+  <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true" hidden>
+    <div class="sheet-head">
+      <h2 id="sheet-title"></h2>
+      <button class="btn btn-icon" id="sheet-close" aria-label="Close">&times;</button>
+    </div>
+    <div id="sheet-body" class="sheet-body"></div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <noscript><p class="empty">Token Table needs JavaScript.</p></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

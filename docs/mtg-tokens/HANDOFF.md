@@ -1,6 +1,6 @@
 # Handoff: "Token Table" — a Magic: The Gathering token tray for the Sandbox
 
-**Status:** planning complete, data assembled, nothing built yet.
+**Status:** built (2026-09-18) at `sandbox/`, following this plan. Kept as the design record and for the day-one verification list in section 3, which still applies. Deviations from the plan are listed in `sandbox/README.md`.
 **Audience:** the model (or person) who will build it. Written so it can be followed step by step without re-doing the research. Read the whole thing once before touching code.
 **Owner:** Ames Grawert (a lawyer, not a programmer). Every message to the owner should be in plain English. The "For the owner" section below is the part the owner needs; the rest is for the builder.
 
