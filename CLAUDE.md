@@ -85,3 +85,7 @@ CNAME                      Custom domain (amesgrawert.com)
   workflows/
     deploy.yml             Deploys repo root to GitHub Pages on push to main
 ```
+
+## Sandbox (planned replacement)
+
+`docs/mtg-tokens/HANDOFF.md` is the plan for replacing the `/game/` city-builder with a Magic: The Gathering token tray at `/sandbox/`. The folder also holds the generated token catalog (`tokens.json`) and the scripts that build and enrich it. Nothing in `/game/` or `index.html` has been changed yet; the handoff says what to change.
