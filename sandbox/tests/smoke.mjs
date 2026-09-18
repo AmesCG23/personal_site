@@ -216,6 +216,30 @@ try {
     check((await page2Pt(p2, "Elf Warrior")).includes("2/2"), "Coat of Arms: 2 Elf Warriors → each +1/+1 (2/2)");
     await p2.locator('[data-toggle="coat-of-arms"]').click();
 
+    // Chronicle of Victory: fixed +2/+2 to the chosen type, like Vanquisher's Banner but bigger
+    await p2.locator('[data-toggle="chronicle-of-victory"]').click();
+    await p2.locator('[data-type="chronicle-of-victory"]').fill("Goblin");
+    await p2.locator('[data-type="chronicle-of-victory"]').blur();
+    await p2.waitForTimeout(50);
+    check((await goblinPt()).includes("3/3"), "Chronicle of Victory (Goblin): Goblin 3/3");
+    check((await page2Pt(p2, "Elf Warrior")) === "1/1", "Chronicle of Victory (Goblin) leaves Elf Warrior alone");
+    await p2.locator('[data-toggle="chronicle-of-victory"]').click();
+
+    // Banner of Kinship: counter is set once, via "Match board count", not recomputed automatically
+    await p2.locator('[data-toggle="banner-of-kinship"]').click();
+    check((await p2.locator('[data-snapshot="banner-of-kinship"]').count()) === 0, "no snapshot button until a type is chosen");
+    await p2.locator('[data-type="banner-of-kinship"]').fill("Goblin");
+    await p2.locator('[data-type="banner-of-kinship"]').blur();
+    await p2.waitForTimeout(50);
+    await p2.locator('[data-snapshot="banner-of-kinship"]').click();
+    check((await p2.locator('[data-counters="banner-of-kinship"]').inputValue()) === "3", "Match board count set the counter to 3 (three Goblins)");
+    check((await goblinPt()).includes("4/4"), "Banner of Kinship with 3 fellowship counters: Goblin 4/4");
+    await p2.locator('[data-counters="banner-of-kinship"]').fill("1");
+    await p2.locator('[data-counters="banner-of-kinship"]').blur();
+    await p2.waitForTimeout(50);
+    check((await goblinPt()).includes("2/2"), "Banner of Kinship counter edited by hand to 1: Goblin 2/2 (doesn't auto-update)");
+    await p2.locator('[data-toggle="banner-of-kinship"]').click();
+
     // Conditional, auto-checked: Path of Bravery follows the life tray
     await p2.locator('[data-toggle="path-of-bravery"]').click();
     check((await goblinPt()).includes("2/2"), "Path of Bravery at starting life: Goblin 2/2");

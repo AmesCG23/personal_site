@@ -52,6 +52,10 @@ export const ANTHEMS = [
     cards: ["Adaptive Automaton"], text: "Other creatures you control of the chosen type get +1/+1. (It's an artifact creature itself, a 2/2 of the chosen type.)" },
   { key: "door-of-destinies", name: "Door of Destinies", group: "tribal", needsType: true, scaling: true,
     cards: ["Door of Destinies"], text: "Creatures you control of the chosen type get +1/+1 for each charge counter (one per spell of that type you've cast since it entered). Set the counter count yourself." },
+  { key: "banner-of-kinship", name: "Banner of Kinship", group: "tribal", needsType: true, scaling: true, snapshotCount: true,
+    cards: ["Banner of Kinship"], text: "As it enters, choose a creature type; it gets a fellowship counter for each creature you already control of that type. Creatures you control of the chosen type get +1/+1 for each fellowship counter. The count is set once, when it enters — use “Match board count” below to set it, then adjust by hand if it changes later." },
+  { key: "chronicle-of-victory", name: "Chronicle of Victory", group: "tribal", needsType: true, bonus: { p: 2, t: 2 },
+    cards: ["Chronicle of Victory"], text: "Creatures you control of the chosen type get +2/+2 and have first strike and trample (this app applies only the +2/+2). Draws a card whenever you cast one." },
 
   { key: "coat-of-arms", name: "Coat of Arms", group: "crosstribal",
     cards: ["Coat of Arms"], text: "Each creature gets +1/+1 for every other creature on the battlefield sharing a creature type with it. Computed automatically from the tokens on your board." },
