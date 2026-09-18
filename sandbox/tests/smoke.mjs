@@ -158,6 +158,94 @@ try {
   check(errors.length === 0, "no console errors" + (errors.length ? ": " + errors.join(" | ") : ""));
   await ctx.close();
 
+  // ---------- anthems & effects ----------
+  {
+    const ctx2 = await browser.newContext({ ...devices["iPhone 15"] });
+    const p2 = await ctx2.newPage();
+    const errors2 = [];
+    p2.on("pageerror", (e) => errors2.push(String(e)));
+    p2.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errors2.push(m.text()); });
+    await stub(p2);
+    await p2.goto(base + "/sandbox/", { waitUntil: "networkidle" });
+    await p2.waitForFunction(() => window.__tt);
+    console.log("anthems & effects");
+
+    await p2.evaluate(() => {
+      const { S, C } = window.__tt;
+      S.addStack(C.toDef(C.defaultFor("Goblin")), { count: 3 });   // 1/1 R, subtype Goblin
+      S.addStack(C.toDef(C.defaultFor("Elf Warrior")), { count: 2 }); // 1/1 G, subtype Elf Warrior
+      S.addStack(C.toDef(C.defaultFor("Zombie")), { count: 2 });   // 2/2 B
+    });
+    const goblinPt = () => page2Pt(p2, "Goblin");
+    async function page2Pt(page, name) {
+      return page.locator(".tile", { hasText: name }).locator(".pt").first().textContent();
+    }
+
+    check((await goblinPt()) === "1/1", "no anthem: Goblin 1/1");
+
+    // Global anthem: Glorious Anthem
+    await p2.click("#btn-more");
+    await p2.locator('[data-m="anthems"]').click();
+    await p2.locator('[data-toggle="glorious-anthem"]').click();
+    check((await goblinPt()).includes("2/2"), "Glorious Anthem on: Goblin 2/2");
+    check((await goblinPt()).startsWith("⚡"), "boosted marker (⚡) shown");
+    const zombiePt1 = await page2Pt(p2, "Zombie");
+    check(zombiePt1.includes("3/3"), "Glorious Anthem also pumps Zombie to 3/3");
+    await p2.locator('[data-toggle="glorious-anthem"]').click();
+    check((await goblinPt()) === "1/1", "Glorious Anthem off: Goblin back to 1/1");
+
+    // Color anthem: Bad Moon only pumps black creatures
+    await p2.locator('[data-toggle="bad-moon"]').click();
+    check((await goblinPt()) === "1/1", "Bad Moon doesn't touch red Goblin");
+    check((await page2Pt(p2, "Zombie")).includes("3/3"), "Bad Moon pumps black Zombie to 3/3");
+    await p2.locator('[data-toggle="bad-moon"]').click();
+
+    // Tribal anthem: needs a type before it applies
+    await p2.locator('[data-toggle="vanquishers-banner"]').click();
+    check((await goblinPt()) === "1/1", "Vanquisher's Banner with no type chosen yet: no bonus");
+    await p2.locator('[data-type="vanquishers-banner"]').fill("Goblin");
+    await p2.locator('[data-type="vanquishers-banner"]').blur();
+    await p2.waitForTimeout(50);
+    check((await goblinPt()).includes("2/2"), "Vanquisher's Banner (Goblin): Goblin 2/2");
+    check((await page2Pt(p2, "Elf Warrior")) === "1/1", "Vanquisher's Banner (Goblin) leaves Elf Warrior alone");
+    await p2.locator('[data-toggle="vanquishers-banner"]').click();
+
+    // Cross-tribal: Coat of Arms, computed from the board's own types
+    await p2.locator('[data-toggle="coat-of-arms"]').click();
+    check((await goblinPt()).includes("3/3"), "Coat of Arms: 3 Goblins → each +2/+2 (3/3)");
+    check((await page2Pt(p2, "Elf Warrior")).includes("2/2"), "Coat of Arms: 2 Elf Warriors → each +1/+1 (2/2)");
+    await p2.locator('[data-toggle="coat-of-arms"]').click();
+
+    // Conditional, auto-checked: Path of Bravery follows the life tray
+    await p2.locator('[data-toggle="path-of-bravery"]').click();
+    check((await goblinPt()).includes("2/2"), "Path of Bravery at starting life: Goblin 2/2");
+    await p2.locator("#sheet-close").click();
+    await p2.locator("#life-minus").click();
+    check((await goblinPt()) === "1/1", "Path of Bravery below starting life: bonus drops automatically");
+    await p2.locator("#life-plus").click();
+    check((await goblinPt()).includes("2/2"), "Path of Bravery back at starting life: bonus returns");
+
+    // Strip: shown while active, tap-to-turn-off, gone once empty
+    check(await p2.locator("#effects-strip").isHidden().then((h) => !h), "effects strip visible while an anthem is active");
+    await p2.locator('#effects-strip [data-off="path-of-bravery"]').click();
+    check((await goblinPt()) === "1/1", "turning off from the strip removes the bonus");
+    check(await p2.locator("#effects-strip").isHidden(), "effects strip hides once nothing is active");
+
+    // Persistence
+    await p2.click("#btn-more");
+    await p2.locator('[data-m="anthems"]').click();
+    await p2.locator('[data-toggle="glorious-anthem"]').click();
+    await p2.locator('[data-toggle="coat-of-arms"]').click();
+    await p2.locator("#sheet-close").click();
+    check((await goblinPt()).includes("4/4"), "Glorious Anthem + Coat of Arms stack: Goblin 4/4 (1 base +1 anthem +2 coat)");
+    await p2.reload({ waitUntil: "networkidle" });
+    await p2.waitForFunction(() => window.__tt);
+    check((await goblinPt()).includes("4/4"), "anthem toggles survive reload");
+
+    check(errors2.length === 0, "no console errors in anthems test" + (errors2.length ? ": " + errors2.join(" | ") : ""));
+    await ctx2.close();
+  }
+
   // ---------- other sizes: screenshots + overflow check ----------
   for (const [label, opts] of [
     ["iphone-se", { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }],

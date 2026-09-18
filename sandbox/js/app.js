@@ -16,8 +16,9 @@ async function main() {
   UI.renderPalette();
   UI.bindBoard();
   UI.bindTray();
+  UI.bindEffectsStrip();
 
-  S.onChange((state) => { UI.renderBoard(state); UI.renderChrome(state); });
+  S.onChange((state) => { UI.renderBoard(state); UI.renderChrome(state); UI.renderEffectsStrip(state); });
   S.init();
 
   $("#btn-undo").onclick = () => S.undo();

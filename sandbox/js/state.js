@@ -2,6 +2,7 @@
 // Rules encoded here are cited by Comprehensive Rules number in comments.
 
 import { loadState, saveState } from "./store.js";
+import { byKey as anthemByKey } from "./anthems.js";
 
 const MAX_HISTORY = 30;
 let listeners = [];
@@ -14,12 +15,15 @@ export let state = fresh();
 export const history = [];
 
 function fresh() {
-  return { version: 1, turn: 1, life: 40, mana: { W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 }, stacks: [] };
+  return { version: 1, turn: 1, life: 40, startingLife: 40, mana: { W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 }, stacks: [], effects: {} };
 }
 
 export function init() {
   const saved = loadState();
   if (saved && saved.version === 1 && Array.isArray(saved.stacks)) state = saved;
+  // Older saved boards predate anthems/starting life: default them in rather than bump the version.
+  if (!state.effects || typeof state.effects !== "object") state.effects = {};
+  if (typeof state.startingLife !== "number") state.startingLife = 40;
   emit();
 }
 
@@ -32,7 +36,7 @@ export function batch(fn) {
 }
 function snapshot() {
   if (batching) return;
-  history.push(JSON.stringify({ turn: state.turn, life: state.life, mana: state.mana, stacks: state.stacks }));
+  history.push(JSON.stringify({ turn: state.turn, life: state.life, startingLife: state.startingLife, mana: state.mana, stacks: state.stacks, effects: state.effects }));
   if (history.length > MAX_HISTORY) history.shift();
 }
 function commit(immediate = false) { saveState(state, immediate); emit(); }
@@ -126,16 +130,69 @@ export function setCustomCounter(id, name, n) {
   s.custom_counter = name && n !== null ? { name, n: n | 0 } : null;
   commit();
 }
-export function power(s) { return numeric(s.base_power, s); }
-export function toughness(s) { return numeric(s.base_toughness, s, true); }
-function numeric(base, s, isT = false) {
+export function power(s) { return numeric(s.base_power, s, anthemBonus(s).p); }
+export function toughness(s) { return numeric(s.base_toughness, s, anthemBonus(s).t); }
+function numeric(base, s, anthemDelta = 0) {
   if (base == null) return null;
   const b = parseInt(base, 10);
-  const delta = s.counters.plus - s.counters.minus;
+  const delta = s.counters.plus - s.counters.minus + anthemDelta;
   if (Number.isNaN(b)) return `${base}${delta ? (delta > 0 ? "+" + delta : delta) : ""}`;
   return b + delta;
 }
 export const isDead = (s) => s.is_creature && typeof toughness(s) === "number" && toughness(s) <= 0;   // 704.5f
+
+// ---- anthems: static team-wide/tribal boosts, folded straight into power()/toughness() ----
+const sharesType = (a, b) => a.some((t) => b.includes(t));
+function effectActive(key, v) {
+  const def = anthemByKey(key);
+  if (!def || !v || !v.on) return false;
+  if (def.needsType && !v.type) return false;
+  if (def.autoLifeCheck) return state.life >= (state.startingLife ?? 40);   // Path of Bravery's own condition
+  return true;
+}
+export const isEffectOn = (key) => !!(state.effects[key] && state.effects[key].on);
+// Every toggled-on effect, in display order, including ones not currently applying
+// (e.g. a tribal effect with no type chosen yet, or Path of Bravery while life is low)
+// so the "Anthems & effects" sheet and the strip can still show them.
+export function activeEffects() {
+  return Object.keys(state.effects)
+    .map((key) => ({ key, def: anthemByKey(key), v: state.effects[key] }))
+    .filter((e) => e.def && e.v && e.v.on);
+}
+export const activeEffectCount = () => activeEffects().length;
+export function anthemBonus(stack) {
+  if (!stack.is_creature) return { p: 0, t: 0 };
+  let p = 0, t = 0;
+  for (const [key, v] of Object.entries(state.effects)) {
+    if (!v || !v.on) continue;
+    const def = anthemByKey(key);
+    if (!def) continue;
+    if (key === "coat-of-arms") {
+      let n = 0;
+      for (const other of state.stacks) {
+        if (!other.is_creature || !sharesType(other.subtypes, stack.subtypes)) continue;
+        n += other === stack ? other.count - 1 : other.count;
+      }
+      if (n > 0) { p += n; t += n; }
+      continue;
+    }
+    if (def.needsType) {
+      if (!v.type || !stack.subtypes.some((st) => st.toLowerCase() === v.type.toLowerCase())) continue;
+      const n = def.scaling ? (v.counters || 0) : 1;
+      p += def.bonus ? def.bonus.p * n : n; t += def.bonus ? def.bonus.t * n : n;
+      continue;
+    }
+    if (def.group === "color" && !stack.colors.includes(def.color)) continue;
+    if (!effectActive(key, v)) continue;   // e.g. Path of Bravery while life is below starting
+    p += def.bonus.p; t += def.bonus.t;
+  }
+  return { p, t };
+}
+
+export function setEffectOn(key, on) { snapshot(); state.effects[key] = { ...(state.effects[key] || {}), on }; commit(); }
+export function setEffectType(key, type) { snapshot(); state.effects[key] = { ...(state.effects[key] || {}), type }; commit(); }
+export function setEffectCounters(key, n) { snapshot(); state.effects[key] = { ...(state.effects[key] || {}), counters: Math.max(0, n | 0) }; commit(); }
+export function setStartingLife(n) { snapshot(); state.startingLife = n | 0; commit(); }
 
 // ---- split / merge / duplicate ----
 export function split(id, k, { tapMoved = false } = {}) {
