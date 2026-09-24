@@ -284,6 +284,23 @@ footer a:hover {
     padding-top: 0;
   }
 
+  .bio {
+    font-size: 15px;
+  }
+
+  .entry h2 {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  .dek {
+    font-size: 14px;
+  }
+
+  .press-list a {
+    font-size: 18px;
+  }
+
   .press-video {
     grid-template-columns: 1fr;
   }
