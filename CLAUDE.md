@@ -47,7 +47,7 @@ The `<head>` of `index.html` carries the discoverability layer:
 All content is live — no placeholders remain.
 
 - **Portrait**: `assets/img/portrait.jpg` (1200×801, 182 KB). Cropped and framed via `object-fit: cover` + `object-position: center 30%`.
-- **Selected Writing**: 6 entries (2020–2026), Brennan Center and NY Daily News
+- **Selected Writing**: 7 entries (2020–2026), Brennan Center and NY Daily News
 - **Press & Video**: 4 citations (chronological, most recent first); Atlantic Festival 2022 YouTube embed at `t=1491`
 - **Footer links**: `ames.grawert@gmail.com` · LinkedIn · Bluesky · MakerWorld · GitHub
 
