@@ -1,4 +1,8 @@
 /**
+ * @OnlyCurrentDoc
+ * (The line above limits this script to the one Sheet it's attached to, rather than
+ * every spreadsheet in your Google account. Keep it.)
+ *
  * Meet — the Google Sheet "doorman" for amesgrawert.com/meet/
  *
  * Paste this whole file into Extensions → Apps Script on the Sheet that should
@@ -11,8 +15,10 @@
 
 // ---- Settings you can change -------------------------------------------------
 
-// A word only you know. Anyone creating a new poll must type it once per device.
-// Leave as '' to let anyone who finds the page create polls.
+// A passphrase only you know: three or four unrelated words, like 'lamp otter gravel'
+// (not a single word or anything about you). Anyone creating a new poll must type it
+// once per device. Leave as '' to let anyone who finds the page create polls.
+// Set it here in Google's copy only; never in the website's copy, which is public.
 var CREATE_PASSCODE = '';
 
 // Your email address to get a note each time someone answers. '' turns it off.

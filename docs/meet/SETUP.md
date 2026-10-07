@@ -21,15 +21,21 @@ You don't need to add any tabs or headings. The script makes an **Events** tab a
 2. Delete the few lines that are already there.
 3. Open `Code.gs` from this folder, copy all of it, and paste it in.
 4. Near the top, fill in the two settings in quotes:
-   - `CREATE_PASSCODE`: a word only you know, e.g. `'tuesday'`. Anyone making a *new*
-     poll has to type it once per device. Friends answering a poll never need it.
-     (Leaving it as `''` lets anyone who finds the page make polls in your Sheet.)
+   - `CREATE_PASSCODE`: a passphrase only you know. Use three or four unrelated
+     words, like `'lamp otter gravel'`, not a single word or anything about you.
+     The page doesn't lock anyone out after wrong guesses, so the length is what
+     protects it. Anyone making a *new* poll has to type it once per device. Friends
+     answering a poll never need it. (Leaving it as `''` lets anyone who finds the
+     page make polls in your Sheet.)
    - `NOTIFY_EMAIL`: your email address if you'd like a note each time someone
      answers, or leave it as `''` for no emails.
 5. Click the **Save** (disk) icon.
 
 Only change the script in Google, not in the website's files. The website's copy
 is public, so the passcode must never go there.
+
+Leave the `@OnlyCurrentDoc` line at the very top in place. It tells Google the script
+may only touch this one Sheet, not every spreadsheet in your account.
 
 ## 3. Turn it on (deploy)
 
@@ -41,8 +47,10 @@ is public, so the passcode must never go there.
 4. Click **Deploy**. Google will ask you to **Authorize access**: pick your account.
    Because this is your own script rather than an app Google has reviewed, it shows a
    warning. Click **Advanced → Go to (project name) (unsafe)**, then **Allow**.
-   What it asks for: to edit this spreadsheet, and to send email as you (used only
-   for the notifications in step 2, and only if you turned them on).
+   What it asks for: to see and edit **only the spreadsheet it's attached to**, and to
+   send email as you (used only for the notifications in step 2, and only if you
+   turned them on). If the screen instead says it wants *all* your Google Sheets
+   spreadsheets, the `@OnlyCurrentDoc` line is missing: cancel and re-paste the script.
 5. Copy the **Web app URL**. It starts `https://script.google.com/macros/s/` and
    ends in `/exec`.
 
@@ -77,6 +85,17 @@ and publish the site. (Or just send the address to Claude and it'll do this step
 After editing `Code.gs` in Google: **Deploy → Manage deployments → (pencil) → Version:
 New version → Deploy**. That keeps the same web address. Choosing "New deployment"
 again would give you a *new* address, and the page would need updating.
+
+## Keeping it safe
+
+- **Don't share the Sheet with edit access.** Anyone who can edit the Sheet can also
+  edit the script attached to it, and the script runs as you. View-only sharing is
+  fine; not sharing it at all is better.
+- **Treat your organizer link like a password.** Whoever has it can close the poll,
+  choose the time and delete answers. It's included in notification emails, so
+  don't forward those.
+- **The website's code is public, and that's fine.** It contains no passcode or keys.
+  The running copy lives in your Google account, and only you can change it.
 
 ## Good to know
 
