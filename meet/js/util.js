@@ -127,10 +127,13 @@ export function download(filename, text, type) {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-/** Share sheet on phones, clipboard elsewhere. Returns what happened, for the button label. */
-export async function shareLink(url, title) {
-  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
-    try { await navigator.share({ title, url }); return 'Shared'; } catch { return null; }
-  }
-  try { await navigator.clipboard.writeText(url); return 'Copied'; } catch { return null; }
+/** The phone's own share sheet (Messages, WhatsApp…), where there is one. */
+export const canShare = () => typeof navigator.share === 'function';
+
+export async function shareSheet(url, title) {
+  try { await navigator.share({ title, url }); return true; } catch { return false; }
+}
+
+export async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
 }

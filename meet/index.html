@@ -9,13 +9,26 @@
   <meta name="robots" content="noindex, nofollow" />
   <meta name="referrer" content="no-referrer" />
   <meta name="theme-color" content="#f3ede1" />
+  <!-- Link preview in Messages etc. Regenerate the image with docs/meet/make-card.mjs. -->
   <meta property="og:title" content="Pick a time" />
   <meta property="og:description" content="Tap the times that work for you." />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://amesgrawert.com/meet/img/social-card.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Pick a time: a navigator writing at a ship’s helm as warships pass the porthole (art: Hanna by Liz Danforth)" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-  <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <!-- Pixel-art Magic card-back icon, for this page only. Regenerate with docs/meet/make-icons.py. -->
+  <link rel="icon" href="icons/favicon.ico" sizes="32x32 64x64" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="Meet" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,6 +39,11 @@
   <main id="app">
     <noscript>This page needs JavaScript turned on.</noscript>
   </main>
+  <footer class="fan">
+    Preview art: <i>Hanna</i> by Liz Danforth. Meet is unofficial Fan Content permitted under the Fan Content Policy.
+    Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast.
+    © Wizards of the Coast LLC.
+  </footer>
   <div id="flash" class="flash" role="status" aria-live="polite"></div>
   <script type="module" src="js/app.js"></script>
 </body>
