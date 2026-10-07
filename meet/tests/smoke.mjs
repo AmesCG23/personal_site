@@ -233,7 +233,7 @@ try {
   check(head.icons.every((u) => u.includes('/meet/')), 'icons are Meet’s own, not the main site’s');
   const man = await (await org.request.get(base + '/meet/manifest.webmanifest')).json();
   check(man.start_url === '/meet/' && man.icons.length === 3, 'home-screen manifest is valid');
-  check((await org.textContent('footer.fan')).includes('Liz Danforth'), 'art credit and Fan Content notice on the page');
+  check((await org.textContent('footer.fan')).includes('John Howe'), 'art credit and Fan Content notice on the page');
 
   check(backend.sheets.Responses.rows.length === 1 + 2 * 3, 'Sheet holds 2 people × 3 times');
 

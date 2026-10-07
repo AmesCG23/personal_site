@@ -1,6 +1,6 @@
 // Renders Meet's link-preview image (what shows when a poll link is pasted into Messages)
 // to meet/img/social-card.jpg, 1200 x 630.   node docs/meet/make-card.mjs
-// Art: "Hanna" (Vanguard, 1997) by Liz Danforth, © Wizards of the Coast, used under the
+// Art: "Opt" by John Howe, © Wizards of the Coast, used under the
 // Fan Content Policy. Keep the credit line on the card.
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 let pw; try { pw = require('playwright'); } catch { pw = require('/opt/node22/lib/node_modules/playwright'); }
 
 const here = (p) => new URL(p, import.meta.url);
-const art = 'data:image/webp;base64,' + readFileSync(here('card-art-hanna.webp')).toString('base64');
+const art = 'data:image/webp;base64,' + readFileSync(here('card-art-opt.webp')).toString('base64');
 const icon = 'data:image/svg+xml;base64,' + readFileSync(here('../../meet/icons/icon.svg')).toString('base64');
 
 const html = `<!doctype html><html><head><meta charset="utf-8">
@@ -31,7 +31,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
     <div class="eyebrow">Meet</div>
     <h1>Pick a time</h1>
     <p class="sub">Tap the times that work for you.</p>
-    <p class="credit">Art: <i>Hanna</i> by Liz Danforth.<br>Magic: The Gathering © Wizards of the Coast.</p>
+    <p class="credit">Art: <i>Opt</i> by John Howe.<br>Magic: The Gathering © Wizards of the Coast.</p>
   </div>
 </body></html>`;
 
