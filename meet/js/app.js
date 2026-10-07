@@ -3,7 +3,7 @@
 //   /meet/?e=ID            answer a poll (the link you send friends)
 //   /meet/?e=ID&k=KEY      the organizer's view: close, pick the final time, remove answers
 import { call, configured } from './api.js';
-import { h, addDays, formatDate, formatTimes, formatOption, memory, icsFile, googleCalendarLink, download, shareLink } from './util.js';
+import { h, addDays, formatDate, formatTimes, formatOption, memory, icsFile, googleCalendarLink, download, canShare, shareSheet, copyText } from './util.js';
 
 const root = document.getElementById('app');
 // Put a page together, skipping the optional pieces that are switched off.
@@ -11,6 +11,8 @@ const mount = (...kids) => root.replaceChildren(...kids.filter((k) => k instance
 const base = location.origin + location.pathname;
 const params = new URLSearchParams(location.search);
 const WORDS = { yes: 'Yes', maybe: 'If need be', no: 'No' };
+const NEED_NAME = 'Please type your name first.';
+const MARKS = { yes: '✓', maybe: '~', no: '✕' };
 
 // ---- Shared pieces ----
 
@@ -37,18 +39,19 @@ function busy(btn, label) {
   return () => { btn.disabled = false; btn.textContent = old; };
 }
 
-function shareBox(url, title, note) {
-  const btn = h('button', { type: 'button', class: 'btn' }, 'Copy link');
-  btn.addEventListener('click', async () => {
-    const done = await shareLink(url, title);
-    if (done) { btn.textContent = done + ' ✓'; setTimeout(() => { btn.textContent = 'Copy link'; }, 2000); }
+function shareBox(url, title) {
+  const copy = h('button', { type: 'button', class: 'btn' }, 'Copy link');
+  copy.addEventListener('click', async () => {
+    if (await copyText(url)) { copy.textContent = 'Copied ✓'; setTimeout(() => { copy.textContent = 'Copy link'; }, 2000); }
     else flash('Couldn’t copy automatically — press and hold the link to copy it.', true);
   });
+  const send = canShare() && h('button', {
+    type: 'button', class: 'btn btn-primary',
+    onclick: () => shareSheet(url, title),
+  }, 'Send link to friends…');
   return h('div', { class: 'share' },
-    note && h('p', { class: 'hint' }, note),
-    h('div', { class: 'share-row' },
-      h('input', { class: 'share-url', type: 'text', readonly: true, value: url, 'aria-label': 'Link', onfocus: (e) => e.target.select() }),
-      btn));
+    h('div', { class: 'share-row' }, send, copy),
+    h('p', { class: 'share-url' }, h('span', {}, 'Friends’ link: '), h('a', { href: url }, url.replace(/^https?:\/\//, ''))));
 }
 
 function setupNotice() {
@@ -112,19 +115,28 @@ function createForm() {
   const form = h('form', { class: 'create', novalidate: true },
     h('h2', {}, 'New poll'),
     h('label', { class: 'field' }, h('span', {}, 'What’s it for?'),
-      h('input', { name: 'title', type: 'text', maxlength: 120, placeholder: 'Game night', required: true })),
+      h('input', { name: 'title', type: 'text', maxlength: 120, placeholder: 'Game night', required: true, autocapitalize: 'sentences', enterkeyhint: 'next' })),
     h('label', { class: 'field' }, h('span', {}, 'Where (optional)'),
-      h('input', { name: 'location', type: 'text', maxlength: 200, placeholder: 'My place' })),
+      h('input', { name: 'location', type: 'text', maxlength: 200, placeholder: 'My place', autocapitalize: 'words', enterkeyhint: 'next' })),
     h('label', { class: 'field' }, h('span', {}, 'Notes (optional)'),
       h('textarea', { name: 'notes', rows: 3, maxlength: 1000, placeholder: 'Bring a deck.' })),
     h('fieldset', {},
       h('legend', {}, 'Times to choose from'),
       h('p', { class: 'hint' }, 'Leave “From” blank for an all-day option. “To” is optional.'),
       list,
-      h('button', { type: 'button', class: 'btn', onclick: addTime }, '+ Add a time')),
+      h('button', { type: 'button', class: 'btn btn-add', onclick: addTime }, '+ Add a time')),
     passWrap,
     msg,
     submit);
+
+  // On a phone keyboard, "Next"/"Go" in a text box moves on instead of submitting half a form.
+  form.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.target.tagName !== 'INPUT' || e.target.type === 'password') return;
+    e.preventDefault();
+    const fields = [...form.querySelectorAll('input, textarea')].filter((f) => !f.closest('[hidden]'));
+    const next = fields[fields.indexOf(e.target) + 1];
+    if (next) next.focus(); else e.target.blur();
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -209,6 +221,7 @@ class PollView {
       (ev.location || ev.notes) && h('div', { class: 'details' },
         ev.location && h('p', { class: 'where' }, ev.location),
         ev.notes && h('p', { class: 'notes' }, ev.notes)),
+      !final && this.summary(),
       ev.isAdmin && this.adminPanel(),
       final && this.finalBanner(final),
       !open && !final && h('p', { class: 'notice' }, 'This poll is closed. The organizer is picking a time.'),
@@ -221,25 +234,46 @@ class PollView {
     }
   }
 
+  /** "3 answered · Best so far: Fri, Oct 16", so phones don't have to scroll for the gist. */
+  summary() {
+    const { ev } = this;
+    const n = ev.participants.length;
+    if (!n) return null;
+    let best = null, bestScore = 0;
+    for (const o of ev.options) {
+      const yes = ev.participants.filter((p) => p.answers[o.id] === 'yes').length;
+      const ok = yes + ev.participants.filter((p) => p.answers[o.id] === 'maybe').length;
+      const sc = ok * 1000 + yes;
+      if (sc > bestScore) { best = o; bestScore = sc; }
+    }
+    return h('p', { class: 'summary' },
+      `${n} ${n === 1 ? 'person has' : 'people have'} answered`,
+      best && h('span', {}, ' · Best so far: ', h('b', {}, formatOption(best))));
+  }
+
   // -- Organizer tools --
 
   adminPanel() {
     const { ev } = this;
     const open = ev.status === 'open';
-    return h('section', { class: 'admin' },
+    return h('section', { class: 'admin' + (this.isNew ? ' is-new' : '') },
       h('h2', {}, this.isNew ? 'Your poll is ready' : 'Organizer view'),
-      shareBox(this.shareUrl, ev.title, 'Send this link to friends:'),
-      h('p', { class: 'hint' },
-        'This page’s own address is your private organizer link — only you should have it. ',
-        'It’s saved on this device and in the Sheet’s “admin_key” column if you lose it.'),
+      this.isNew && h('p', { class: 'hint' }, 'Send friends the link below. This page is just for you.'),
+      shareBox(this.shareUrl, ev.title),
       h('div', { class: 'admin-actions' },
         h('button', {
           type: 'button', class: 'btn',
           onclick: (e) => this.admin(e.target, open ? 'close' : 'reopen'),
         }, open ? 'Close the poll' : 'Reopen the poll'),
         h('span', { class: 'hint' }, open
-          ? 'Closing stops new answers. To announce the time, use “Choose this time” below.'
-          : 'Closed: people can see results but not answer.')));
+          ? 'Stops new answers. Announce the time with “Choose this time” below.'
+          : 'Closed: people can see results but not answer.')),
+      h('details', { class: 'admin-more', open: this.isNew },
+        h('summary', {}, 'About this organizer page'),
+        h('p', { class: 'hint' },
+          'This page’s own address is your private organizer link. Treat it like a password: whoever has it can close ',
+          'the poll, choose the time and remove answers. It’s saved on this device (under “Your polls” on the Meet home ',
+          'page) and in the Sheet’s “admin_key” column if you lose it.')));
   }
 
   async admin(btn, op, extra = {}) {
@@ -272,6 +306,7 @@ class PollView {
 
   answerForm(open, final) {
     const { ev } = this;
+    this.progress = null;
     const tallies = ev.options.map((o) => {
       const t = { yes: [], maybe: [], no: [] };
       for (const p of ev.participants) (t[p.answers[o.id]] || t.no).push(p.name);
@@ -309,12 +344,17 @@ class PollView {
     const list = h('ol', { class: 'opts' }, cards);
     if (!open) return h('section', { class: 'answers' }, h('h2', {}, 'Results'), list);
 
+    const msg = h('div', { class: 'form-msg', role: 'alert' });
     const nameInput = h('input', {
       id: 'name', type: 'text', maxlength: 60, autocomplete: 'name', value: this.name, placeholder: 'Your name',
-      oninput: (e) => { this.name = e.target.value; },
+      autocapitalize: 'words', enterkeyhint: 'done',
+      oninput: (e) => { this.name = e.target.value; if (e.target.value.trim() && msg.textContent === NEED_NAME) msg.replaceChildren(); },
+      // On a phone, "Done" on the keyboard would otherwise submit before any times are picked.
+      onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } },
     });
-    const msg = h('div', { class: 'form-msg', role: 'alert' });
     const save = h('button', { type: 'submit', class: 'btn btn-primary' }, this.me ? 'Update my answers' : 'Save my answers');
+    this.progress = h('p', { class: 'hint progress', 'aria-live': 'polite' });
+    this.updateProgress();
     const form = h('form', { class: 'answers', novalidate: true },
       h('h2', {}, 'Which times work for you?'),
       h('label', { class: 'field', for: 'name' }, h('span', {}, 'Your name')),
@@ -327,7 +367,7 @@ class PollView {
       list,
       h('div', { class: 'savebar' },
         msg,
-        h('p', { class: 'hint' }, 'Anything left blank counts as “No”.'),
+        this.progress,
         save));
     form.addEventListener('submit', (e) => { e.preventDefault(); this.save(save, msg, nameInput, false); });
     return form;
@@ -341,16 +381,24 @@ class PollView {
         onclick: () => {
           this.draft[o.id] = this.draft[o.id] === a ? undefined : a;
           for (const b of group.children) b.setAttribute('aria-pressed', String(this.draft[o.id] === b.dataset.answer));
+          this.updateProgress();
         },
-      }, WORDS[a]));
+      }, h('span', { class: 'mark', 'aria-hidden': 'true' }, MARKS[a]), WORDS[a]));
     }
     return group;
+  }
+
+  updateProgress() {
+    if (!this.progress) return;
+    const n = this.ev.options.filter((o) => this.draft[o.id]).length;
+    const total = this.ev.options.length;
+    this.progress.textContent = n === total ? `All ${total} answered` : `${n} of ${total} answered · blanks count as “No”`;
   }
 
   async save(btn, msg, nameInput, replace) {
     msg.replaceChildren();
     const name = this.name.trim();
-    if (!name) { msg.textContent = 'Please type your name first.'; nameInput.focus(); return; }
+    if (!name) { msg.textContent = NEED_NAME; nameInput.focus(); return; }
     const answers = {};
     for (const [k, v] of Object.entries(this.draft)) if (v) answers[k] = v;
     const done = busy(btn, 'Saving…');

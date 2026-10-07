@@ -97,7 +97,9 @@ try {
   const adminUrl = org.url();
   check(/\?e=[a-p]{10}&k=[a-p]{24}$/.test(adminUrl), 'lands on the organizer view (new=1 tidied out of the address)');
   check((await org.textContent('.admin h2')) === 'Your poll is ready', 'says the poll is ready');
-  const shareUrl = await org.inputValue('.share-url');
+  const shareUrl = await org.getAttribute('.share-url a', 'href');
+  check(await org.isVisible('.share >> text=Copy link'), 'copy-link button shown');
+  check(await org.locator('.admin-more').evaluate((d) => d.open), 'organizer-link explanation open on first visit');
   check(/\?e=[a-p]{10}$/.test(shareUrl) && !shareUrl.includes('k='), 'share link has no admin key');
   check((await org.locator('.opt').count()) === 3, 'three times listed');
   check((await org.locator('.opt-date').first().textContent()) === 'Fri, Oct 16' && (await org.locator('.opt-time').first().textContent()) === '7–10 pm', 'times read naturally');
@@ -108,8 +110,12 @@ try {
 
   // Organizer answers too
   await org.fill('#name', 'Ames');
+  await org.press('#name', 'Enter');
+  check((await org.locator('.people li').count()) === 0 && !(await org.isVisible('.savebar .form-msg:not(:empty)')), 'keyboard Done/Enter in the name box doesn’t submit');
+  check((await org.textContent('.progress')).startsWith('0 of 3 answered'), 'save bar counts answers (0 of 3)');
   await org.locator('.opt').nth(0).locator('[data-answer=yes]').click();
   await org.locator('.opt').nth(1).locator('[data-answer=maybe]').click();
+  check((await org.textContent('.progress')).startsWith('2 of 3 answered'), '…and updates as you tap (2 of 3)');
   await org.locator('.savebar .btn-primary').click();
   await org.waitForSelector('.people li');
   check((await org.locator('.people li').count()) === 1, 'organizer’s own answer saved');
@@ -124,12 +130,14 @@ try {
   await fr.goto(shareUrl, { waitUntil: 'networkidle' });
   await fr.waitForSelector('.opts');
   check(!(await fr.isVisible('.admin')) && (await fr.locator('text=Choose this time').count()) === 0, 'friend sees no organizer tools');
+  check((await fr.textContent('.summary')).includes('Best so far: Fri, Oct 16'), 'summary line gives the gist at the top');
   check((await fr.textContent('.opt.best .opt-date')) === 'Fri, Oct 16', '“best so far” marks the leading time');
   await layout(fr, 'poll (small phone)');
 
   await fr.click('.savebar .btn-primary');
   check((await fr.textContent('.savebar .form-msg')).includes('name'), 'name is required');
   await fr.fill('#name', 'Jo');
+  check(!(await fr.isVisible('.savebar .form-msg:not(:empty)')), 'name warning clears once a name is typed');
   const yes0 = fr.locator('.opt').nth(0).locator('[data-answer=yes]');
   await yes0.click();
   check((await yes0.getAttribute('aria-pressed')) === 'true', 'tapping Yes selects it');
@@ -180,6 +188,8 @@ try {
   console.log('organizer wraps up');
   await org.reload({ waitUntil: 'networkidle' });
   await org.waitForSelector('.admin');
+  check(!(await org.locator('.admin-more').evaluate((d) => d.open)), 'explanation folded away on later visits');
+  await layout(org, 'organizer, returning (phone)');
   await org.click('text=Close the poll');
   await org.waitForSelector('text=Reopen the poll');
   check(!(await org.isVisible('.savebar')), 'closed poll hides the answer buttons');
@@ -210,6 +220,20 @@ try {
   await fr.goto(base + '/meet/?e=abcdefghij', { waitUntil: 'networkidle' });
   await fr.waitForSelector('h1');
   check((await fr.textContent('h1')) === 'No poll here', 'bad link handled');
+
+  // Icons and link preview
+  const head = await org.evaluate(() => ({
+    og: document.querySelector('meta[property="og:image"]').content,
+    icons: [...document.querySelectorAll('link[rel~=icon], link[rel=apple-touch-icon], link[rel=manifest]')].map((l) => l.href),
+  }));
+  check(head.og === 'https://amesgrawert.com/meet/img/social-card.jpg', 'link-preview image set');
+  const local = [head.og.replace('https://amesgrawert.com', base), ...head.icons];
+  const codes = await Promise.all(local.map((u) => org.request.get(u).then((r) => r.status())));
+  check(codes.every((c) => c === 200), 'preview image, icons and manifest all load' + (codes.every((c) => c === 200) ? '' : ' ' + JSON.stringify(codes)));
+  check(head.icons.every((u) => u.includes('/meet/')), 'icons are Meet’s own, not the main site’s');
+  const man = await (await org.request.get(base + '/meet/manifest.webmanifest')).json();
+  check(man.start_url === '/meet/' && man.icons.length === 3, 'home-screen manifest is valid');
+  check((await org.textContent('footer.fan')).includes('Liz Danforth'), 'art credit and Fan Content notice on the page');
 
   check(backend.sheets.Responses.rows.length === 1 + 2 * 3, 'Sheet holds 2 people × 3 times');
 

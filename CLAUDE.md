@@ -82,7 +82,7 @@ assets/
 sandbox/                   Token Table (see below)
 meet/                      Meet scheduling poll (hidden; see below)
 docs/mtg-tokens/           Token Table plan, catalog builder, enrichment script
-docs/meet/                 Meet's Google Apps Script (Code.gs) + SETUP.md
+docs/meet/                 Meet's Google Apps Script (Code.gs), SETUP.md, icon + preview-card generators
 CNAME                      Custom domain (amesgrawert.com)
 .nojekyll                  Disables Jekyll processing on GitHub Pages
 .github/
@@ -109,4 +109,6 @@ A Doodle-style scheduling poll. **Not linked from anywhere** on the site and mar
 - `meet/js/config.js` holds the Apps Script `/exec` URL. It's empty until the owner deploys the script; the page then shows a "not connected" note.
 - The creator passcode and notification email are set **only in the Google copy** of `Code.gs`. Never commit them: the repo copy is published on the site.
 - Links: `?e=ID` is the friend link; `?e=ID&k=ADMINKEY` is the organizer view (close/reopen, choose the final time, remove answers).
+- **Own icon, not the site's:** pixel-art Magic card back (`meet/icons/`, plus `meet/manifest.webmanifest` for "Add to Home Screen"). The main site keeps the AG monogram. Regenerate with `python3 docs/meet/make-icons.py`.
+- **Link preview:** `meet/img/social-card.jpg` (1200×630), set as `og:image`. Built from `docs/meet/card-art-hanna.webp` (*Hanna*, Vanguard, by Liz Danforth, © Wizards of the Coast) by `node docs/meet/make-card.mjs`. The artist credit is on the card, and the Fan Content notice is in the page footer. Keep both.
 - Tests: `node meet/tests/backend.test.mjs` (Code.gs against a pretend Sheet), then `node meet/tests/smoke.mjs` with a static server on port 8123 (full browser run against the same pretend Sheet).
