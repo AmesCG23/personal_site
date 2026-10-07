@@ -1,6 +1,6 @@
 // Renders Meet's link-preview image (what shows when a poll link is pasted into Messages)
 // to meet/img/social-card.jpg, 1200 x 630.   node docs/meet/make-card.mjs
-// Art: "Hanna" (Vanguard, 1997) by Liz Danforth, © Wizards of the Coast, used under the
+// Art: "Opt" by John Howe, © Wizards of the Coast, used under the
 // Fan Content Policy. Keep the credit line on the card.
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 let pw; try { pw = require('playwright'); } catch { pw = require('/opt/node22/lib/node_modules/playwright'); }
 
 const here = (p) => new URL(p, import.meta.url);
-const art = 'data:image/webp;base64,' + readFileSync(here('card-art-hanna.webp')).toString('base64');
+const art = 'data:image/webp;base64,' + readFileSync(here('card-art-opt.webp')).toString('base64');
 const icon = 'data:image/svg+xml;base64,' + readFileSync(here('../../meet/icons/icon.svg')).toString('base64');
 
 const html = `<!doctype html><html><head><meta charset="utf-8">
@@ -19,7 +19,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
   .art { width: 690px; height: 630px; overflow: hidden; border-right: 3px solid #1a1814; }
   .art img { width: 100%; height: 100%; object-fit: cover; object-position: 38% 50%; display: block; }
   .text { flex: 1; padding: 64px 56px 36px; display: flex; flex-direction: column; }
-  .icon { width: 90px; height: 90px; image-rendering: pixelated; margin-left: -6px; }
+  .icon { width: 90px; height: 90px; margin-left: -6px; }
   .eyebrow { margin-top: 30px; font-size: 18px; letter-spacing: .22em; text-transform: uppercase; color: #5e564a; }
   h1 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 92px; line-height: .95; letter-spacing: -.02em; margin-top: 10px; }
   .sub { font-size: 27px; font-style: italic; color: #5e564a; margin-top: 18px; line-height: 1.3; }
@@ -31,7 +31,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
     <div class="eyebrow">Meet</div>
     <h1>Pick a time</h1>
     <p class="sub">Tap the times that work for you.</p>
-    <p class="credit">Art: <i>Hanna</i> by Liz Danforth.<br>Magic: The Gathering © Wizards of the Coast.</p>
+    <p class="credit">Art: <i>Opt</i> by John Howe.<br>Magic: The Gathering © Wizards of the Coast.</p>
   </div>
 </body></html>`;
 
