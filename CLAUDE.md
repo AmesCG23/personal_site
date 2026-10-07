@@ -80,7 +80,9 @@ assets/
   img/
     portrait.jpg           Headshot (1200×801)
 sandbox/                   Token Table (see below)
+meet/                      Meet scheduling poll (hidden; see below)
 docs/mtg-tokens/           Token Table plan, catalog builder, enrichment script
+docs/meet/                 Meet's Google Apps Script (Code.gs) + SETUP.md
 CNAME                      Custom domain (amesgrawert.com)
 .nojekyll                  Disables Jekyll processing on GitHub Pages
 .github/
@@ -98,3 +100,13 @@ A Magic: The Gathering token tray for iPad/iPhone, linked from the footer as "Sa
 - `sandbox/tests/smoke.mjs` — Playwright smoke test (run a static server on the repo root at port 8123, then `node sandbox/tests/smoke.mjs`). Stubs Scryfall; checks the handoff's worked scenario, layout at phone/tablet sizes, 44 px hit targets.
 - Legal: unofficial Fan Content notice and Scryfall/Cockatrice credits live in the About sheet (`ui.js`, `aboutSheet`). Keep artist credit next to any art crop.
 - The old `/game/` city-builder was removed in favour of this (still in git history).
+
+## Hidden page: Meet (`/meet/`)
+
+A Doodle-style scheduling poll. **Not linked from anywhere** on the site and marked `noindex`. Keep it that way: don't add it to the footer or a robots.txt (a robots.txt entry would itself advertise the path). Details: `meet/README.md`. Owner-facing setup guide: `docs/meet/SETUP.md`.
+
+- Static page (`meet/index.html`, `meet/css/meet.css`, `meet/js/`) talks to a Google Apps Script web app (`docs/meet/Code.gs`) that stores polls in a Google Sheet. One Sheet holds every poll, kept apart by event ID, so there's no wiping between events. Tabs: `Events`, `Responses` (one row per person per time).
+- `meet/js/config.js` holds the Apps Script `/exec` URL. It's empty until the owner deploys the script; the page then shows a "not connected" note.
+- The creator passcode and notification email are set **only in the Google copy** of `Code.gs`. Never commit them: the repo copy is published on the site.
+- Links: `?e=ID` is the friend link; `?e=ID&k=ADMINKEY` is the organizer view (close/reopen, choose the final time, remove answers).
+- Tests: `node meet/tests/backend.test.mjs` (Code.gs against a pretend Sheet), then `node meet/tests/smoke.mjs` with a static server on port 8123 (full browser run against the same pretend Sheet).
