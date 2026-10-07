@@ -56,8 +56,9 @@ try {
   const org = await orgCtx.newPage();
   const orgErrors = []; watch(org, orgErrors);
 
-  // Not set up yet: the real config.js is empty
+  // Not set up yet: pretend config.js is empty
   const bare = await browser.newPage();
+  await bare.route('**/meet/js/config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "export const API_URL = '';" }));
   await bare.goto(base + '/meet/');
   await bare.waitForSelector('.notice');
   check((await bare.textContent('.notice')).includes('Not connected yet'), 'unconfigured page says so instead of failing');
