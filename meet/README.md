@@ -11,7 +11,7 @@ an Apps Script web app. Setup and day-to-day use: `../docs/meet/SETUP.md`.
 - `js/api.js`: sends requests to the Sheet script, as plain-text POSTs so Apps Script doesn't need CORS preflight.
 - `js/config.js`: the Apps Script `/exec` address. When it's empty, the page shows a "not connected" note.
 - `js/util.js`: element builder, date formatting, localStorage, `.ics` and Google Calendar links.
-- `icons/`, `manifest.webmanifest`: Meet's own pixel-art icon (a Magic card back), drawn by `../docs/meet/make-icons.py`.
+- `icons/`, `manifest.webmanifest`: Meet's own icon, an "MTG" monogram in the main site's favicon style, drawn by `../docs/meet/make-icons.py`.
 - `img/social-card.jpg`: the link preview shown in Messages, rendered by `../docs/meet/make-card.mjs` from `../docs/meet/card-art-opt.webp`. Art: *Opt* by John Howe, © Wizards of the Coast. Keep the credit on the card and the Fan Content notice in the page footer.
 - `../docs/meet/Code.gs`: the Apps Script. Settings (passcode, notify email) are filled in only in Google's copy.
 

@@ -19,7 +19,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
   .art { width: 690px; height: 630px; overflow: hidden; border-right: 3px solid #1a1814; }
   .art img { width: 100%; height: 100%; object-fit: cover; object-position: 38% 50%; display: block; }
   .text { flex: 1; padding: 64px 56px 36px; display: flex; flex-direction: column; }
-  .icon { width: 90px; height: 90px; image-rendering: pixelated; margin-left: -6px; }
+  .icon { width: 90px; height: 90px; margin-left: -6px; }
   .eyebrow { margin-top: 30px; font-size: 18px; letter-spacing: .22em; text-transform: uppercase; color: #5e564a; }
   h1 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 92px; line-height: .95; letter-spacing: -.02em; margin-top: 10px; }
   .sub { font-size: 27px; font-style: italic; color: #5e564a; margin-top: 18px; line-height: 1.3; }
